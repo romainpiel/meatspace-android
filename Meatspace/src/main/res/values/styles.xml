@@ -1,0 +1,15 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="Meatspace" parent="android:Theme.Holo.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Meatspace.Container">
+        <item name="android:paddingLeft">@dimen/horizontal_padding</item>
+        <item name="android:paddingRight">@dimen/horizontal_padding</item>
+        <item name="android:paddingTop">@dimen/vertical_padding</item>
+        <item name="android:paddingBottom">@dimen/vertical_padding</item>
+    </style>
+
+</resources>

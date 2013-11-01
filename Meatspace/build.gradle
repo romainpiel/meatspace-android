@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.6.+'
+    }
+}
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.0.+'
+    compile 'com.jakewharton:butterknife:3.0.0'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.squareup.retrofit:retrofit:1.2.2'
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.0"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 19
+    }
+
+    buildTypes {
+        debug {
+            buildConfig "public final static boolean IS_DEBUG = true;",
+                    "public final static String MEATSPACE_BASE_URL = \"http://10.0.0.23:3000\";"
+        }
+        release.initWith(buildTypes.debug)
+        release {
+            buildConfig "public final static boolean IS_DEBUG = false;",
+                    "public final static String MEATSPACE_BASE_URL = \"https://chat.meatspac.es\";"
+        }
+    }
+}
