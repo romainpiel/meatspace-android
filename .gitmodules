@@ -1,0 +1,3 @@
+[submodule "Library/android-websockets"]
+	path = Library/android-websockets
+	url = https://github.com/RomainPiel/android-websockets.git
