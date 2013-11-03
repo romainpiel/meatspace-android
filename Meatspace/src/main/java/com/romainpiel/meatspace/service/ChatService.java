@@ -36,6 +36,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     private BusManager busManager;
     private SocketIOClient socketIOClient;
     private Handler handler;
+    private boolean initialized;
 
     @Override
     public void onCreate() {
@@ -46,9 +47,18 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     }
 
     @Override
+    public void onDestroy() {
+        if (socketIOClient != null) {
+            socketIOClient.disconnect();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
 
-        if (socketIOClient == null) {
+        if (!initialized) {
+            initialized = true;
             apiManager.connect(this);
         }
 
