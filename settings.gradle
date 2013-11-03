@@ -1,1 +1,2 @@
 include ':Meatspace'
+include ':Library:android-websockets'

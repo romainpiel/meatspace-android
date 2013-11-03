@@ -6,12 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.romainpiel.lib.BusManager;
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.ui.adapter.BaseFragment;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.model.ChatList;
+import com.squareup.otto.Subscribe;
 
 import butterknife.InjectView;
 import butterknife.Views;
@@ -61,23 +63,30 @@ public class ChatFragment extends BaseFragment {
     public void onPause() {
         super.onPause();
         BackgroundExecutor.cancelAll(API_GET_CHAT_REQ_ID, true);
+        BusManager.get().getChatBus().unregister(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BusManager.get().getChatBus().register(this);
+    }
+
+    @Subscribe
+    public void onMessage(ChatList chatList) {
+        notifyDatasetChanged(chatList, false);
     }
 
     public void fetchChat() {
+        // TODO do that in the ChatService
         BackgroundExecutor.execute(
                 new Runnable() {
                     @Override
                     public void run() {
                         final ChatList chatList = ApiManager.get().meatspace().getChats();
                         if (chatList != null) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.setItems(chatList.get());
-                                    adapter.notifyDataSetChanged();
-                                    initialized = true;
-                                }
-                            });
+                            notifyDatasetChanged(chatList, true);
+                            initialized = true;
                         }
                     }
                 },
@@ -86,4 +95,30 @@ public class ChatFragment extends BaseFragment {
         );
     }
 
+    public void notifyDatasetChanged(final ChatList chatList, final boolean clearBefore) {
+        notifyDatasetChanged(new Runnable() {
+            @Override
+            public void run() {
+                if (clearBefore) {
+                    adapter.setItems(chatList.get());
+                } else {
+                    adapter.appendItems(chatList.get());
+                }
+            }
+        });
+    }
+
+    public void notifyDatasetChanged(final Runnable runBefore) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (runBefore != null) {
+                    runBefore.run();
+                }
+                adapter.notifyDataSetChanged();
+                initialized = true;
+            }
+
+        });
+    }
 }

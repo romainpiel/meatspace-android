@@ -3,7 +3,8 @@
 <fragment
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/main_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="com.romainpiel.lib.ui.fragment.ChatFragment"
+        android:name="com.romainpiel.lib.ui.fragment.ChatFragment"
         tools:layout="@layout/fragment_chat"/>

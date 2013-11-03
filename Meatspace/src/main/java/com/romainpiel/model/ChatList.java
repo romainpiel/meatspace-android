@@ -12,6 +12,11 @@ public class ChatList {
 
     private Content chats;
 
+    public ChatList(List<Chat> chats) {
+        this.chats = new Content();
+        this.chats.set(chats);
+    }
+
     public List<Chat> get() {
         return chats != null? chats.get() : null;
     }
@@ -21,6 +26,10 @@ public class ChatList {
 
         public List<Chat> get() {
             return chats;
+        }
+
+        public void set(List<Chat> chats) {
+            this.chats = chats;
         }
     }
 }

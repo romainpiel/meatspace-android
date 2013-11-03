@@ -1,4 +1,4 @@
-package com.romainpiel.lib.api.meatspace;
+package com.romainpiel.lib.api;
 
 import com.romainpiel.model.ChatList;
 
@@ -10,7 +10,7 @@ import retrofit.http.GET;
  * Date: 01/11/2013
  * Time: 17:05
  */
-public interface MeatspaceClient {
+public interface MeatspaceRestClient {
 
     @GET("/get/chats")
     public ChatList getChats();

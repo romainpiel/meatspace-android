@@ -1,6 +1,6 @@
 package com.romainpiel.lib.ui.adapter;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 
 /**
  * Meatspace

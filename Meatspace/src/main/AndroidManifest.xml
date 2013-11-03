@@ -20,6 +20,8 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".service.ChatService"/>
+
     </application>
 
 </manifest>
