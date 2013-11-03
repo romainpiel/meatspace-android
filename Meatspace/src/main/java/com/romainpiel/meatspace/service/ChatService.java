@@ -49,7 +49,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     @Override
     public void onDestroy() {
         if (socketIOClient != null) {
-            socketIOClient.disconnect();
+            apiManager.disconnect(socketIOClient);
         }
         super.onDestroy();
     }
