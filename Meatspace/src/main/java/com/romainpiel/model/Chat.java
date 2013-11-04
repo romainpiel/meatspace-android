@@ -1,5 +1,9 @@
 package com.romainpiel.model;
 
+import android.util.Base64;
+
+import java.io.InputStream;
+
 /**
  * Meatspace
  * User: romainpiel
@@ -33,6 +37,7 @@ public class Chat {
         private String media;
         private int ttl;
         private long created;
+        private transient InputStream inputStreamMedia;
 
         public String getFingerprint() {
             return fingerprint;
@@ -72,6 +77,11 @@ public class Chat {
 
         public void setCreated(long created) {
             this.created = created;
+        }
+
+        public byte[] getGIFbytes() {
+            String gifData = media.replace("data:image/gif;base64,", "");
+            return Base64.decode(gifData, Base64.DEFAULT);
         }
     }
 }

@@ -12,6 +12,4 @@
         <item name="android:paddingBottom">@dimen/vertical_padding</item>
     </style>
 
-    <style name="Widget.GifMoviewView" parent="@android:style/Widget"></style>
-
 </resources>

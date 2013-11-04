@@ -1,9 +1,7 @@
 package com.romainpiel.lib.ui.view;
 
 import android.content.Context;
-import android.graphics.Movie;
 import android.util.AttributeSet;
-import android.util.Base64;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,7 +25,7 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
 
     InflateHelper inflateHelper;
 
-    @InjectView(R.id.item_chat_gif) GifMovieView gif;
+    @InjectView(R.id.item_chat_gif) GIFView gif;
     @InjectView(R.id.item_chat_timestamp) TextView timestamp;
     @InjectView(R.id.item_chat_message) TextView message;
 
@@ -63,12 +61,7 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
 
             Chat.Value value = chat.getValue();
 
-            String gifData = value.getMedia().replace("data:image/gif;base64,", "");
-//            gif.setImage(Base64.decode(gifData, Base64.DEFAULT));
-
-            byte[] bytes = Base64.decode(gifData, Base64.DEFAULT);
-            Movie movie = Movie.decodeByteArray(bytes, 0, bytes.length);
-            gif.setMovie(movie);
+            gif.setImage(value.getGIFbytes());
 
             Date date = new Date(value.getCreated());
             timestamp.setText(com.romainpiel.lib.utils.DateUtils.formatTime(getContext(), date));

@@ -2,7 +2,7 @@
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.romainpiel.lib.ui.view.GifMovieView
+    <com.romainpiel.lib.ui.view.GIFView
             android:id="@+id/item_chat_gif"
             android:layout_height="100dp"
             android:layout_width="100dp"/>
