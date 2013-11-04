@@ -43,7 +43,6 @@ public class GIFView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
         if (decode != null && decode.getFrameCount() > 0) {
-            Debug.out("decode");
             canvas.drawBitmap(decode.next(), 0, 0, paint);
             postInvalidateDelayed(150);
         }
