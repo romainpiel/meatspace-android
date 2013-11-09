@@ -10,6 +10,7 @@ import com.romainpiel.lib.BusManager;
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.ui.adapter.BaseFragment;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
+import com.romainpiel.lib.ui.view.CameraPreview;
 import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.model.ChatList;
@@ -29,6 +30,7 @@ public class ChatFragment extends BaseFragment {
     private static final String API_GET_CHAT_REQ_ID = "ChatFragment.GET_CHAT";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
+    @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
 
     private ChatAdapter adapter;
     private boolean initialized;
@@ -41,6 +43,7 @@ public class ChatFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, null);
         Views.inject(this, view);
+
         return view;
     }
 

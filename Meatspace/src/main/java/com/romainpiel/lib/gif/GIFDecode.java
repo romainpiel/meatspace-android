@@ -1,5 +1,5 @@
 // Created by JeffMeJones@gmail.com
-package com.romainpiel.lib.gif.decoder;
+package com.romainpiel.lib.gif;
 
 
 
