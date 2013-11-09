@@ -8,7 +8,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.romainpiel.lib.gif.decoder.GIFDecode;
+import com.romainpiel.lib.gif.GIFDecode;
 
 import java.io.ByteArrayInputStream;
 
@@ -55,11 +55,11 @@ public class GIFView extends View {
             int bWidth = bmp.getWidth();
             int bHeight = bmp.getHeight();
 
-            int cWidth = canvas.getWidth();
-            int cHeight = canvas.getHeight();
+            int vWidth = getWidth();
+            int vHeight = getHeight();
 
-            int width = portrait? bWidth : bHeight * cWidth / cHeight;
-            int height = portrait? bWidth * cHeight / cWidth : bHeight;
+            int width = portrait? bWidth : bHeight * vWidth / vHeight;
+            int height = portrait? bWidth * vHeight / vWidth : bHeight;
 
             src.left = bWidth/2 - width/2;
             src.top = bHeight/2 - height/2;
@@ -68,8 +68,8 @@ public class GIFView extends View {
 
             dst.left = 0;
             dst.top = 0;
-            dst.right = canvas.getWidth();
-            dst.bottom = canvas.getHeight();
+            dst.right = vWidth;
+            dst.bottom = vHeight;
 
             canvas.drawBitmap(bmp, src, dst, paint);
 
