@@ -1,7 +1,11 @@
 package com.romainpiel.lib.ui.fragment;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +13,7 @@ import android.widget.ListView;
 
 import com.romainpiel.lib.BusManager;
 import com.romainpiel.lib.api.ApiManager;
-import com.romainpiel.lib.ui.adapter.BaseFragment;
+import com.romainpiel.lib.gif.AnimatedGifEncoder;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.view.CameraPreview;
 import com.romainpiel.lib.utils.BackgroundExecutor;
@@ -17,7 +21,11 @@ import com.romainpiel.meatspace.R;
 import com.romainpiel.model.ChatList;
 import com.squareup.otto.Subscribe;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+
 import butterknife.InjectView;
+import butterknife.OnClick;
 import butterknife.Views;
 
 /**
@@ -26,8 +34,9 @@ import butterknife.Views;
  * Date: 01/11/2013
  * Time: 16:55
  */
-public class ChatFragment extends BaseFragment implements Camera.PreviewCallback {
+public class ChatFragment extends Fragment implements Camera.PreviewCallback {
 
+    public static final int CAPTURE_DURATION = 2000;
     private static final String API_GET_CHAT_REQ_ID = "ChatFragment.GET_CHAT";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
@@ -35,9 +44,32 @@ public class ChatFragment extends BaseFragment implements Camera.PreviewCallback
 
     private ChatAdapter adapter;
     private boolean initialized;
+    private boolean capturing;
+    private Handler uiHandler;
+    private Runnable stopCaptureRunnable;
+    private AnimatedGifEncoder gifEncoder;
+    private OutputStream gifStream;
 
     public ChatFragment() {
         this.initialized = false;
+        this.uiHandler = new Handler();
+        this.stopCaptureRunnable = new Runnable() {
+            @Override
+            public void run() {
+                capturing = false;
+
+                gifEncoder.finish();
+
+                // TODO use data from gifStream to send it
+                // ...
+
+                gifStream = null;
+            }
+        };
+        this.gifEncoder = new AnimatedGifEncoder();
+        this.gifEncoder.setDelay(150);
+        this.gifEncoder.setRepeat(0);
+        this.gifEncoder.setSize(128, 96);
     }
 
     @Override
@@ -115,7 +147,7 @@ public class ChatFragment extends BaseFragment implements Camera.PreviewCallback
     }
 
     public void notifyDatasetChanged(final Runnable runBefore) {
-        runOnUiThread(new Runnable() {
+        uiHandler.post(new Runnable() {
             @Override
             public void run() {
                 if (runBefore != null) {
@@ -128,8 +160,26 @@ public class ChatFragment extends BaseFragment implements Camera.PreviewCallback
         });
     }
 
+    @OnClick(R.id.fragment_chat_send)
+    public void send() {
+        if (!capturing) {
+            gifStream = new ByteArrayOutputStream();
+            gifEncoder.start(gifStream);
+
+            uiHandler.postDelayed(stopCaptureRunnable, CAPTURE_DURATION);
+
+            capturing = true;
+        }
+    }
+
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        // TODO use bitmap data when in capture mode
+
+        if (capturing) {
+            // TODO maybe do that in a separate thread
+            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            gifEncoder.addFrame(bitmap);
+            bitmap.recycle();
+        }
     }
 }
