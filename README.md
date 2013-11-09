@@ -13,7 +13,7 @@ Check out the sources and submodules:
 
 To run the server on your machine, follow the instructions described [there](https://github.com/meatspaces/meatspace-chat).
 
-In the android project, edit the variable DEBUG_BASE_URL Meatspace/gradle.build:
+In the android project, edit the variable `DEBUG_BASE_URL` Meatspace/gradle.build:
 
 ```groovy
 def DEBUG_BASE_URL = "http://192.168.1.90:3000" // set your computer IP there
