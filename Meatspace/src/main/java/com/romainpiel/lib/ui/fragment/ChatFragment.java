@@ -1,5 +1,6 @@
 package com.romainpiel.lib.ui.fragment;
 
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ import butterknife.Views;
  * Date: 01/11/2013
  * Time: 16:55
  */
-public class ChatFragment extends BaseFragment {
+public class ChatFragment extends BaseFragment implements Camera.PreviewCallback {
 
     private static final String API_GET_CHAT_REQ_ID = "ChatFragment.GET_CHAT";
 
@@ -43,6 +44,8 @@ public class ChatFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, null);
         Views.inject(this, view);
+
+        cameraPreview.setPreviewCallback(this);
 
         return view;
     }
@@ -123,5 +126,10 @@ public class ChatFragment extends BaseFragment {
             }
 
         });
+    }
+
+    @Override
+    public void onPreviewFrame(byte[] data, Camera camera) {
+        // TODO use bitmap data when in capture mode
     }
 }

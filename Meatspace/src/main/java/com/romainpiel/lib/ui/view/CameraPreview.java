@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.Surface;
@@ -18,75 +17,72 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * This class assumes the parent layout is RelativeLayout.LayoutParams.
+ * This class assumes the parent layout is LinearLayout.LayoutParams.
  */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
-    private static final String CAMERA_PARAM_ORIENTATION = "orientation";
-    private static final String CAMERA_PARAM_LANDSCAPE = "landscape";
-    private static final String CAMERA_PARAM_PORTRAIT = "portrait";
-
-    protected Context context;
+    private Context context;
     private SurfaceHolder holder;
-    protected Camera camera;
-    protected List<Camera.Size> previewSizeList;
-    protected List<Camera.Size> pictureSizeList;
-    protected Camera.Size previewSize;
-    protected Camera.Size pictureSize;
+    private Camera camera;
+    private List<Camera.Size> previewSizeList;
+    private List<Camera.Size> pictureSizeList;
+    private Camera.Size previewSize;
+    private Camera.Size pictureSize;
     private int surfaceChangedCallDepth = 0;
-    private int cameraId;
     private LayoutMode layoutMode;
     private int centerPosX = -1;
     private int centerPosY;
-
-    /**
-     * State flag: true when surface's layout size is set and surfaceChanged()
-     * process has not been completed.
-     */
-    protected boolean mSurfaceConfiguring = false;
-
-    PreviewReadyCallback mPreviewReadyCallback = null;
+    private boolean surfaceConfiguring = false;
+    private PreviewReadyCallback previewReadyCallback = null;
+    private PreviewCallback previewCallback;
 
     public CameraPreview(Context context) {
         super(context);
-        init(context, 0, LayoutMode.NoBlank);
+        init(context, LayoutMode.NoBlank);
     }
 
     public CameraPreview(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, 0, LayoutMode.NoBlank);
+        init(context, LayoutMode.NoBlank);
     }
 
     public CameraPreview(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init(context, 0, LayoutMode.NoBlank);
+        init(context, LayoutMode.NoBlank);
     }
 
-    private void init(Context context, int cameraId, LayoutMode mode) {
+    private void init(Context context, LayoutMode mode) {
         this.context = context;
         layoutMode = mode;
         holder = getHolder();
         holder.addCallback(this);
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            if (Camera.getNumberOfCameras() > cameraId) {
-                this.cameraId = cameraId;
-            } else {
-                this.cameraId = 0;
-            }
+        int cameraId = findFrontFacingCamera();
+        if (cameraId < 0) {
+            camera = Camera.open();
         } else {
-            this.cameraId = 0;
+            camera = Camera.open(cameraId);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            camera = Camera.open(this.cameraId);
-        } else {
-            camera = Camera.open();
-        }
         Camera.Parameters cameraParams = camera.getParameters();
         previewSizeList = cameraParams.getSupportedPreviewSizes();
         pictureSizeList = cameraParams.getSupportedPictureSizes();
+    }
+
+    private int findFrontFacingCamera() {
+        int cameraId = -1;
+        // Search for the front facing camera
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                cameraId = i;
+                break;
+            }
+        }
+        return cameraId;
     }
 
     @Override
@@ -109,31 +105,33 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private void doSurfaceChanged(int width, int height) {
         camera.stopPreview();
 
+        camera.setPreviewCallback(previewCallback);
+
         Camera.Parameters cameraParams = camera.getParameters();
         boolean portrait = isPortrait();
 
         // The code in this if-statement is prevented from executed again when surfaceChanged is
         // called again due to the change of the layout size in this if-statement.
-        if (!mSurfaceConfiguring) {
+        if (!surfaceConfiguring) {
             Camera.Size previewSize = determinePreviewSize(portrait, width, height);
             Camera.Size pictureSize = determinePictureSize(previewSize);
 
             this.previewSize = previewSize;
             this.pictureSize = pictureSize;
-            mSurfaceConfiguring = adjustSurfaceLayoutSize(previewSize, portrait, width, height);
+            surfaceConfiguring = adjustSurfaceLayoutSize(previewSize, portrait, width, height);
             // Continue executing this method if this method is called recursively.
             // Recursive call of surfaceChanged is very special case, which is a path from
             // the catch clause at the end of this method.
             // The later part of this method should be executed as well in the recursive
             // invocation of this method, because the layout change made in this recursive
             // call will not trigger another invocation of this method.
-            if (mSurfaceConfiguring && (surfaceChangedCallDepth <= 1)) {
+            if (surfaceConfiguring && (surfaceChangedCallDepth <= 1)) {
                 return;
             }
         }
 
         configureCameraParameters(cameraParams, portrait);
-        mSurfaceConfiguring = false;
+        surfaceConfiguring = false;
 
         try {
             camera.startPreview();
@@ -151,9 +149,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             }
         }
 
-        if (null != mPreviewReadyCallback) {
-            mPreviewReadyCallback.onPreviewReady();
+        if (null != previewReadyCallback) {
+            previewReadyCallback.onPreviewReady();
         }
+
     }
 
     /**
@@ -278,34 +277,27 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     protected void configureCameraParameters(Camera.Parameters cameraParams, boolean portrait) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) { // for 2.1 and before
-            if (portrait) {
-                cameraParams.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_PORTRAIT);
-            } else {
-                cameraParams.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_LANDSCAPE);
-            }
-        } else { // for 2.2 and later
-            int angle;
-            Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-            switch (display.getRotation()) {
-                case Surface.ROTATION_0: // This is display orientation
-                    angle = 90; // This is camera orientation
-                    break;
-                case Surface.ROTATION_90:
-                    angle = 0;
-                    break;
-                case Surface.ROTATION_180:
-                    angle = 270;
-                    break;
-                case Surface.ROTATION_270:
-                    angle = 180;
-                    break;
-                default:
-                    angle = 90;
-                    break;
-            }
-            camera.setDisplayOrientation(angle);
+
+        int angle;
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        switch (display.getRotation()) {
+            case Surface.ROTATION_0: // This is display orientation
+                angle = 90; // This is camera orientation
+                break;
+            case Surface.ROTATION_90:
+                angle = 0;
+                break;
+            case Surface.ROTATION_180:
+                angle = 270;
+                break;
+            case Surface.ROTATION_270:
+                angle = 180;
+                break;
+            default:
+                angle = 90;
+                break;
         }
+        camera.setDisplayOrientation(angle);
 
         cameraParams.setPreviewSize(previewSize.width, previewSize.height);
         cameraParams.setPictureSize(pictureSize.width, pictureSize.height);
@@ -331,18 +323,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
     }
 
-    public void setOneShotPreviewCallback(PreviewCallback callback) {
-        if (null == camera) {
-            return;
-        }
-        camera.setOneShotPreviewCallback(callback);
+    public PreviewCallback getPreviewCallback() {
+        return previewCallback;
     }
 
-    public void setPreviewCallback(PreviewCallback callback) {
-        if (null == camera) {
-            return;
-        }
-        camera.setPreviewCallback(callback);
+    public void setPreviewCallback(PreviewCallback previewCallback) {
+        this.previewCallback = previewCallback;
     }
 
     public Camera.Size getPreviewSize() {
@@ -350,7 +336,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void setOnPreviewReady(PreviewReadyCallback cb) {
-        mPreviewReadyCallback = cb;
+        previewReadyCallback = cb;
     }
 
     public static enum LayoutMode {
