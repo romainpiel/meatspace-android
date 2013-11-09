@@ -5,7 +5,7 @@ An android client for the great chatting space [https://chat.meatspac.es](https:
 ## Setting up
 
 Check out the sources and submodules:
-```
+```bash
 > git submodule update
 ```
 
@@ -15,19 +15,19 @@ To run the server on your machine, follow the instructions described [there](htt
 
 In the android project, edit the variable DEBUG_BASE_URL Meatspace/gradle.build:
 
-```
+```groovy
 def DEBUG_BASE_URL = "http://192.168.1.90:3000" // set your computer IP there
 ```
 
 To start the android app in debug mode, run that from the android project folder:
 
-```
+```bash
 > ./gradlew installDebug
 ```
 
 ### Using production server:
 
-```
+```bash
 > ./gradlew installRelease
 ```
 
