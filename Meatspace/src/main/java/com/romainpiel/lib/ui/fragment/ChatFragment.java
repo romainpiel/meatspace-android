@@ -1,28 +1,25 @@
 package com.romainpiel.lib.ui.fragment;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.romainpiel.lib.BusManager;
 import com.romainpiel.lib.api.ApiManager;
-import com.romainpiel.lib.gif.AnimatedGifEncoder;
+import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.view.CameraPreview;
 import com.romainpiel.lib.utils.BackgroundExecutor;
+import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.R;
+import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
 import com.squareup.otto.Subscribe;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -34,42 +31,22 @@ import butterknife.Views;
  * Date: 01/11/2013
  * Time: 16:55
  */
-public class ChatFragment extends Fragment implements Camera.PreviewCallback {
+public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureListener, CameraPreview.PreviewReadyCallback {
 
-    public static final int CAPTURE_DURATION = 2000;
     private static final String API_GET_CHAT_REQ_ID = "ChatFragment.GET_CHAT";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
+    @InjectView(R.id.fragment_chat_send) Button sendBtn;
 
     private ChatAdapter adapter;
+    private PreviewHelper previewHelper;
     private boolean initialized;
-    private boolean capturing;
     private Handler uiHandler;
-    private Runnable stopCaptureRunnable;
-    private AnimatedGifEncoder gifEncoder;
-    private OutputStream gifStream;
 
     public ChatFragment() {
         this.initialized = false;
         this.uiHandler = new Handler();
-        this.stopCaptureRunnable = new Runnable() {
-            @Override
-            public void run() {
-                capturing = false;
-
-                gifEncoder.finish();
-
-                // TODO use data from gifStream to send it
-                // ...
-
-                gifStream = null;
-            }
-        };
-        this.gifEncoder = new AnimatedGifEncoder();
-        this.gifEncoder.setDelay(150);
-        this.gifEncoder.setRepeat(0);
-        this.gifEncoder.setSize(128, 96);
     }
 
     @Override
@@ -77,7 +54,10 @@ public class ChatFragment extends Fragment implements Camera.PreviewCallback {
         View view = inflater.inflate(R.layout.fragment_chat, null);
         Views.inject(this, view);
 
-        cameraPreview.setPreviewCallback(this);
+        previewHelper = new PreviewHelper(uiHandler);
+        previewHelper.setOnCaptureListener(this);
+        cameraPreview.setPreviewCallback(previewHelper);
+        cameraPreview.setOnPreviewReady(this);
 
         return view;
     }
@@ -95,6 +75,11 @@ public class ChatFragment extends Fragment implements Camera.PreviewCallback {
         }
 
         listView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onPreviewReady() {
+        previewHelper.setAngle(cameraPreview.getAngle());
     }
 
     @Override
@@ -162,24 +147,20 @@ public class ChatFragment extends Fragment implements Camera.PreviewCallback {
 
     @OnClick(R.id.fragment_chat_send)
     public void send() {
-        if (!capturing) {
-            gifStream = new ByteArrayOutputStream();
-            gifEncoder.start(gifStream);
-
-            uiHandler.postDelayed(stopCaptureRunnable, CAPTURE_DURATION);
-
-            capturing = true;
-        }
+        previewHelper.capture();
     }
 
     @Override
-    public void onPreviewFrame(byte[] data, Camera camera) {
+    public void onCaptureStarted() {
+        sendBtn.setEnabled(false);
+    }
 
-        if (capturing) {
-            // TODO maybe do that in a separate thread
-            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            gifEncoder.addFrame(bitmap);
-            bitmap.recycle();
-        }
+    @Override
+    public void onCaptureComplete(byte[] gifData) {
+
+        Chat chat = new Chat("", "message", gifData);
+        Debug.out(chat);
+
+        sendBtn.setEnabled(true);
     }
 }

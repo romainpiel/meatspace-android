@@ -32,6 +32,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private LayoutMode layoutMode;
     private int centerPosX = -1;
     private int centerPosY;
+    private int angle;
     private boolean surfaceConfiguring = false;
     private PreviewReadyCallback previewReadyCallback = null;
     private PreviewCallback previewCallback;
@@ -90,8 +91,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             camera.setPreviewDisplay(this.holder);
         } catch (IOException e) {
-            camera.release();
-            camera = null;
+            stop();
         }
     }
 
@@ -278,7 +278,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     protected void configureCameraParameters(Camera.Parameters cameraParams, boolean portrait) {
 
-        int angle;
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         switch (display.getRotation()) {
             case Surface.ROTATION_0: // This is display orientation
@@ -314,9 +313,16 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         if (null == camera) {
             return;
         }
+
         camera.stopPreview();
+        camera.setPreviewCallback(null);
+        holder.removeCallback(this);
         camera.release();
         camera = null;
+    }
+
+    public int getAngle() {
+        return angle;
     }
 
     public boolean isPortrait() {

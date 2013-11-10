@@ -61,7 +61,7 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
 
             Chat.Value value = chat.getValue();
 
-            gif.setImage(value.getGIFbytes());
+            gif.setImage(value.mediaToGIFbytes());
 
             Date date = new Date(value.getCreated());
             timestamp.setText(com.romainpiel.lib.utils.DateUtils.formatTime(getContext(), date));
