@@ -5,7 +5,7 @@ import android.content.Context;
 import java.util.Date;
 
 /**
- * BlaBlaCar
+ * Meatspace
  * User: romainpiel
  * Date: 20/08/2013
  * Time: 11:45

@@ -8,7 +8,7 @@ import com.romainpiel.lib.ui.listener.OnViewChangedListener;
 import com.romainpiel.lib.ui.listener.OnViewChangedNotifier;
 
 /**
- * BlaBlaCar
+ * Meatspace
  * User: romainpiel
  * Date: 28/08/2013
  * Time: 15:19

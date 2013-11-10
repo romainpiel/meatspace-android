@@ -4,7 +4,7 @@ import android.text.Editable;
 import android.widget.EditText;
 
 /**
- * BlaBlaCar
+ * Meatspace
  * User: romainpiel
  * Date: 28/08/2013
  * Time: 11:46

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * BlaBlaCar
+ * Meatspace
  * User: romainpiel
  * Date: 28/08/2013
  * Time: 15:13

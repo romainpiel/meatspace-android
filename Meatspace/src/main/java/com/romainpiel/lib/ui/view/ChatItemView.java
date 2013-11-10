@@ -18,7 +18,7 @@ import butterknife.InjectView;
 import butterknife.Views;
 
 /**
- * BlaBlaCar
+ * Meatspace
  * User: romainpiel
  * Date: 02/09/2013
  * Time: 14:40
