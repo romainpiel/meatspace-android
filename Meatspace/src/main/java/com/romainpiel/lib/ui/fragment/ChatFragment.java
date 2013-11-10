@@ -7,18 +7,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.romainpiel.lib.BusManager;
 import com.romainpiel.lib.api.ApiManager;
+import com.romainpiel.lib.gif.GIFUtils;
 import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.view.CameraPreview;
 import com.romainpiel.lib.utils.BackgroundExecutor;
-import com.romainpiel.lib.utils.Debug;
+import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.R;
-import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
+import com.romainpiel.model.ChatRequest;
+import com.romainpiel.model.Device;
 import com.squareup.otto.Subscribe;
 
 import butterknife.InjectView;
@@ -37,12 +40,14 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
+    @InjectView(R.id.fragment_chat_input) EditText input;
     @InjectView(R.id.fragment_chat_send) Button sendBtn;
 
     private ChatAdapter adapter;
     private PreviewHelper previewHelper;
     private boolean initialized;
     private Handler uiHandler;
+    private Device device;
 
     public ChatFragment() {
         this.initialized = false;
@@ -68,6 +73,10 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         if (adapter == null) {
             adapter = new ChatAdapter(getActivity());
+        }
+
+        if (device == null) {
+            device = new Device(getActivity());
         }
 
         if (!initialized) {
@@ -158,8 +167,13 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Override
     public void onCaptureComplete(byte[] gifData) {
 
-        Chat chat = new Chat("", "message", gifData);
-        Debug.out(chat);
+        ChatRequest chatRequest = new ChatRequest(
+                "blahblahblah",
+                UIUtils.getText(input),
+                GIFUtils.mediaFromGIFbytes(gifData),
+                device.getId()
+        );
+        BusManager.get().getChatBus().post(chatRequest);
 
         sendBtn.setEnabled(true);
     }

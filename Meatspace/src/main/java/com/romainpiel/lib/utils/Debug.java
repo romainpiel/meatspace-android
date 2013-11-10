@@ -9,6 +9,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.romainpiel.Constants;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,7 +24,7 @@ import java.util.Set;
  * @todo Add debug outputs for more data types
  */
 public class Debug {
-    private final static String LOG_TAG = "MEATSPACE";
+
     private static boolean DEBUG = true;
 
     /**
@@ -71,10 +73,10 @@ public class Debug {
 
     public static void longInfo(String str) {
         if (str.length() > 4000) {
-            Log.e(LOG_TAG, str.substring(0, 4000));
+            Log.e(Constants.LOG_TAG, str.substring(0, 4000));
             longInfo(str.substring(4000));
         } else {
-            Log.e(LOG_TAG, str);
+            Log.e(Constants.LOG_TAG, str);
         }
     }
 

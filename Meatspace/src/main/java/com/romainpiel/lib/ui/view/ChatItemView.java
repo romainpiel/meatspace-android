@@ -5,8 +5,10 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.romainpiel.lib.gif.GIFUtils;
 import com.romainpiel.lib.ui.helper.InflateHelper;
 import com.romainpiel.lib.ui.listener.OnViewChangedListener;
+import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.model.Chat;
 
@@ -61,7 +63,12 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
 
             Chat.Value value = chat.getValue();
 
-            gif.setImage(value.mediaToGIFbytes());
+            try {
+                gif.setImage(GIFUtils.mediaToGIFbytes(value.getMedia()));
+            } catch (IllegalArgumentException e) {
+                // the gif could not be decoded
+                Debug.out(e);
+            }
 
             Date date = new Date(value.getCreated());
             timestamp.setText(com.romainpiel.lib.utils.DateUtils.formatTime(getContext(), date));

@@ -1,11 +1,5 @@
 package com.romainpiel.model;
 
-import android.util.Base64;
-
-import com.romainpiel.lib.utils.Debug;
-
-import java.io.UnsupportedEncodingException;
-
 /**
  * Meatspace
  * User: romainpiel
@@ -16,11 +10,6 @@ public class Chat {
 
     private String key;
     private Value value;
-
-    public Chat(String fingerprint, String message, byte[] gifBytes) {
-        // TODO fill remaining fields
-        value = new Value(fingerprint, message, gifBytes, 0, 0);
-    }
 
     public String getKey() {
         return key;
@@ -44,16 +33,6 @@ public class Chat {
         private String media;
         private int ttl;
         private long created;
-
-        private static final String GIF_PREFIX = "data:image/gif;base64,";
-
-        public Value(String fingerprint, String message, byte[] gifBytes, int ttl, long created) {
-            this.fingerprint = fingerprint;
-            this.message = message;
-            mediaFromGIFbytes(gifBytes);
-            this.ttl = ttl;
-            this.created = created;
-        }
 
         public String getFingerprint() {
             return fingerprint;
@@ -93,19 +72,6 @@ public class Chat {
 
         public void setCreated(long created) {
             this.created = created;
-        }
-
-        public void mediaFromGIFbytes(byte[] bytes) {
-            try {
-                media = GIF_PREFIX + new String(Base64.encode(bytes, Base64.DEFAULT), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                Debug.out(e);
-            }
-        }
-
-        public byte[] mediaToGIFbytes() {
-            String gifData = media.replace(GIF_PREFIX, "");
-            return Base64.decode(gifData, Base64.DEFAULT);
         }
     }
 }

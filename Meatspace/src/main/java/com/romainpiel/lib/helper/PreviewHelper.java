@@ -8,6 +8,7 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.Handler;
 
+import com.romainpiel.Constants;
 import com.romainpiel.lib.gif.AnimatedGifEncoder;
 
 import java.io.ByteArrayOutputStream;
@@ -19,10 +20,6 @@ import java.io.ByteArrayOutputStream;
  * Time: 17:03
  */
 public class PreviewHelper implements Camera.PreviewCallback {
-
-    public static final int CAPTURE_DURATION = 2000;
-    public static final float CAPTURE_WIDTH = 128;
-    public static final float CAPTURE_HEIGHT = 96;
 
     private Handler uiHandler;
     private int angle;
@@ -77,7 +74,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
             gifStream = new ByteArrayOutputStream();
             gifEncoder.start(gifStream);
 
-            uiHandler.postDelayed(stopCaptureRunnable, CAPTURE_DURATION);
+            uiHandler.postDelayed(stopCaptureRunnable, Constants.CAPTURE_DURATION);
 
             capturing = true;
 
@@ -111,9 +108,9 @@ public class PreviewHelper implements Camera.PreviewCallback {
             matrix.postRotate(-angle);
 
             if (realW > realH) {
-                matrix.postScale(CAPTURE_WIDTH / realW, CAPTURE_WIDTH / realW);
+                matrix.postScale(Constants.CAPTURE_WIDTH / realW, Constants.CAPTURE_WIDTH / realW);
             } else {
-                matrix.postScale(CAPTURE_HEIGHT / realH, CAPTURE_HEIGHT / realH);
+                matrix.postScale(Constants.CAPTURE_HEIGHT / realH, Constants.CAPTURE_HEIGHT / realH);
             }
 
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,

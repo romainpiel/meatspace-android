@@ -29,7 +29,9 @@ public class ChatAdapter extends BaseAdapter {
 
     public void setItems(List<Chat> items) {
         this.items.clear();
-        this.items.addAll(items);
+        if (items != null) {
+            this.items.addAll(items);
+        }
     }
 
     public void appendItems(List<Chat> items) {

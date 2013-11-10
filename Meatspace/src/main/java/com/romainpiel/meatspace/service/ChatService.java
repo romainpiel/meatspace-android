@@ -16,6 +16,8 @@ import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
+import com.romainpiel.model.ChatRequest;
+import com.squareup.otto.Subscribe;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +45,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         super.onCreate();
         apiManager = ApiManager.get();
         busManager = BusManager.get();
+        busManager.getChatBus().register(this);
         handler = new Handler();
     }
 
@@ -51,6 +54,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         if (socketIOClient != null) {
             apiManager.disconnect(socketIOClient);
         }
+        busManager.getChatBus().unregister(this);
         super.onDestroy();
     }
 
@@ -120,6 +124,16 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                     }
                 }
             });
+        }
+    }
+
+    @Subscribe
+    public void onEvent(ChatRequest chatRequest) {
+        if (socketIOClient != null) {
+            Gson jsonParser = apiManager.getJsonParser();
+
+            // 4 : json type (? not sure why)
+            socketIOClient.emitRaw(4, jsonParser.toJson(chatRequest), null);
         }
     }
 }
