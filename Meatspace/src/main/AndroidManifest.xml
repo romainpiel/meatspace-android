@@ -20,7 +20,7 @@
         <activity
                 android:name=".activity.MainActivity"
                 android:hardwareAccelerated="false"
-                android:label="Chat">
+                android:label="Meatspace">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

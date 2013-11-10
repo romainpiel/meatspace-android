@@ -1,6 +1,8 @@
 package com.romainpiel.lib.ui.view;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,6 +28,7 @@ import butterknife.Views;
 public class ChatItemView extends LinearLayout implements OnViewChangedListener {
 
     InflateHelper inflateHelper;
+    Drawable foregroundSelector;
 
     @InjectView(R.id.item_chat_gif) GIFView gif;
     @InjectView(R.id.item_chat_timestamp) TextView timestamp;
@@ -43,7 +46,10 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
 
     private void init() {
         inflateHelper = new InflateHelper(getContext(), this, this, R.layout.item_chat);
+        foregroundSelector = getResources().getDrawable(R.drawable.item_fg_ms);
+
         setOrientation(HORIZONTAL);
+        setBackgroundResource(R.drawable.item_chat_bg_ms);
     }
 
     @Override
@@ -79,5 +85,26 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
     @Override
     public void onViewChanged() {
         Views.inject(this);
+    }
+
+    @Override
+    protected void drawableStateChanged() {
+        super.drawableStateChanged();
+        foregroundSelector.setState(getDrawableState());
+
+        //redraw
+        invalidate();
+    }
+
+    @Override
+    protected void onSizeChanged(int width, int height, int oldwidth, int oldheight) {
+        super.onSizeChanged(width, height, oldwidth, oldheight);
+        foregroundSelector.setBounds(0, 0, width, height);
+    }
+
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+        foregroundSelector.draw(canvas);
     }
 }

@@ -6,8 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.romainpiel.lib.BusManager;
@@ -41,7 +41,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @InjectView(R.id.fragment_chat_list) ListView listView;
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
     @InjectView(R.id.fragment_chat_input) EditText input;
-    @InjectView(R.id.fragment_chat_send) Button sendBtn;
+    @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
 
     private ChatAdapter adapter;
     private PreviewHelper previewHelper;
@@ -136,6 +136,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
                 } else {
                     adapter.appendItems(chatList.get());
                 }
+                UIUtils.scrollToBottom(listView, adapter);
             }
         });
     }
@@ -161,6 +162,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     @Override
     public void onCaptureStarted() {
+        input.setEnabled(false);
         sendBtn.setEnabled(false);
     }
 
@@ -175,6 +177,9 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         );
         BusManager.get().getChatBus().post(chatRequest);
 
+        input.setText(null);
+
+        input.setEnabled(true);
         sendBtn.setEnabled(true);
     }
 }

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <dimen name="vertical_padding">10dp</dimen>
     <dimen name="horizontal_padding">10dp</dimen>
+
+    <dimen name="ab_height">45dp</dimen>
+
+    <dimen name="translucent_ab_wind_padding_top">55dp</dimen>
+
 </resources>

@@ -9,7 +9,16 @@
             android:id="@+id/fragment_chat_list"
             android:layout_height="0dp"
             android:layout_width="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:transcriptMode="alwaysScroll"
+            android:listSelector="@android:color/transparent"
+            android:cacheColorHint="@null"
+            android:clipToPadding="false"
+            android:dividerHeight="@dimen/vertical_padding"
+            android:divider="@android:color/transparent"
+            android:paddingTop="@dimen/translucent_ab_wind_padding_top"
+            android:scrollbarStyle="outsideOverlay"
+            style="@style/Meatspace.Container"/>
 
     <LinearLayout
             android:layout_height="wrap_content"
@@ -19,7 +28,8 @@
         <com.romainpiel.lib.ui.view.CameraPreview
                 android:id="@+id/fragment_chat_camera_preview"
                 android:layout_height="100dp"
-                android:layout_width="100dp"/>
+                android:layout_width="100dp"
+                android:layout_marginLeft="@dimen/horizontal_padding"/>
 
         <EditText
                 android:id="@+id/fragment_chat_input"
@@ -27,11 +37,13 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"/>
 
-        <Button
+        <ImageButton
                 android:id="@+id/fragment_chat_send"
                 android:layout_height="match_parent"
                 android:layout_width="wrap_content"
-                android:text="Send"/>
+                android:src="@android:drawable/ic_menu_send"
+                android:background="@drawable/button_bg_ms"
+                style="@style/Meatspace.Container"/>
 
     </LinearLayout>
 

@@ -1,7 +1,9 @@
 package com.romainpiel.lib.utils;
 
 import android.text.Editable;
+import android.widget.Adapter;
 import android.widget.EditText;
+import android.widget.ListView;
 
 /**
  * Meatspace
@@ -23,5 +25,14 @@ public class UIUtils {
             result = editable.toString();
         }
         return result;
+    }
+
+    public static void scrollToBottom(final ListView listView, final Adapter adapter) {
+        listView.post(new Runnable() {
+            @Override
+            public void run() {
+                listView.setSelection(adapter.getCount() - 1);
+            }
+        });
     }
 }
