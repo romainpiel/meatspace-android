@@ -14,6 +14,7 @@
 
     <style name="Meatspace.ActionBar.TitleTextStyle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textColor">@color/ms_ab_text</item>
+        <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
     <style name="Meatspace.Container">

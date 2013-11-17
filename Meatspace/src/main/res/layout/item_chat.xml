@@ -7,17 +7,25 @@
             android:layout_height="100dp"
             android:layout_width="100dp"/>
 
-    <TextView
-            android:id="@+id/item_chat_timestamp"
+    <LinearLayout
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            style="@style/Meatspace.Container"/>
+            android:orientation="vertical"
+            style="@style/Meatspace.Container">
+        <TextView
+                android:id="@+id/item_chat_timestamp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textColor="@color/ms_item_timestamp"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-    <TextView
-            android:id="@+id/item_chat_message"
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            style="@style/Meatspace.Container"/>
+        <TextView
+                android:id="@+id/item_chat_message"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textColor="@color/ms_item_message"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="5dp"/>
+    </LinearLayout>
 
 </merge>
