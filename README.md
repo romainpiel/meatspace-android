@@ -13,10 +13,21 @@ Check out the sources and submodules:
 
 To run the server on your machine, follow the instructions described [there](https://github.com/meatspaces/meatspace-chat).
 
-In the android project, edit the variable `DEBUG_BASE_URL` Meatspace/gradle.build:
+In the android project, edit the variable `url_api_debug` Meatspace/src/main/res/values/urls.xml:
 
-```groovy
-def DEBUG_BASE_URL = "http://192.168.1.90:3000" // set your computer IP there
+```xml
+    <string name="url_api_debug">http://192.168.1.110:3000</string> // set your computer IP here
+```
+
+List your keys in the file located at
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key_api_debug">blahblahblah</string>
+    <string name="key_api_staging"></string>
+    <string name="key_api_release"></string>
+</resources>
 ```
 
 To start the android app in debug mode, run that from the android project folder:
