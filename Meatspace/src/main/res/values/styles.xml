@@ -5,6 +5,7 @@
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:actionBarStyle">@style/Meatspace.ActionBar.Translucent</item>
         <item name="android:actionBarSize">@dimen/ab_height</item>
+        <item name="android:actionBarItemBackground">@drawable/ab_button_bg_ms</item>
     </style>
 
     <style name="Meatspace.ActionBar.Translucent" parent="android:Widget.ActionBar">

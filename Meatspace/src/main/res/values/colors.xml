@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ms_ab_bg">#99222222</color>
+    <color name="ms_ab_button">#00000000</color>
+    <color name="ms_ab_button_pressed">#33f8bed5</color>
     <color name="ms_ab_text">#ffffffff</color>
     <color name="ms_button_bg_disabled">#00000000</color>
     <color name="ms_button_bg_pressed">#33f8bed5</color>
