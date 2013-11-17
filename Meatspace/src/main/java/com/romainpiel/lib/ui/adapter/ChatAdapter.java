@@ -35,10 +35,6 @@ public class ChatAdapter extends BaseAdapter {
         }
     }
 
-    public void appendItems(Collection<Chat> items) {
-        this.items.addAll(items);
-    }
-
     @Override
     public int getCount() {
         return items.size();

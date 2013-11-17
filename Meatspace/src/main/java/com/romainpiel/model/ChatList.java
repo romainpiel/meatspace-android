@@ -16,12 +16,11 @@ public class ChatList {
     private boolean fromNetwork;
 
     public ChatList() {
-        this(null, false);
+        this(null);
     }
 
-    public ChatList(Collection<Chat> chats, boolean fromNetwork) {
+    public ChatList(Collection<Chat> chats) {
         this.chats = new Content();
-        this.fromNetwork = fromNetwork;
 
         if (chats != null) {
             this.chats.addAll(chats);

@@ -102,7 +102,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     @Subscribe
     public void onMessage(ChatList chatList) {
-        notifyDatasetChanged(chatList, false);
+        notifyDatasetChanged(chatList);
 
         if (chatList.isFromNetwork()) {
             dismissProgressDialog();
@@ -111,15 +111,11 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         }
     }
 
-    public void notifyDatasetChanged(final ChatList chatList, final boolean clearBefore) {
+    public void notifyDatasetChanged(final ChatList chatList) {
         notifyDatasetChanged(new Runnable() {
             @Override
             public void run() {
-                if (clearBefore) {
-                    adapter.setItems(chatList.get());
-                } else {
-                    adapter.appendItems(chatList.get());
-                }
+                adapter.setItems(chatList.get());
                 UIUtils.scrollToBottom(listView, adapter);
             }
         });
