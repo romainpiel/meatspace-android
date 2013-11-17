@@ -29,6 +29,15 @@
                 style="@style/Meatspace.Container"/>
 
         <TextView
+                android:id="@+id/dialog_about_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:fontFamily="sans-serif-light"
+                style="@style/Meatspace.Container.Horizontal"/>
+
+        <TextView
                 android:id="@+id/dialog_about_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

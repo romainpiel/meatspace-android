@@ -2,6 +2,8 @@ package com.romainpiel.meatspace.activity;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.meatspace.service.ChatService;
@@ -58,9 +61,18 @@ public class MainActivity extends FragmentActivity {
     private void showAboutDialog() {
         ViewGroup view = (ViewGroup) View.inflate(this, R.layout.dialog_about, null);
 
-        TextView textView = (TextView) view.findViewById(R.id.dialog_about_message);
-        textView.setText(Html.fromHtml(getString(R.string.dialog_about_content)));
-        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            TextView versionTv = (TextView) view.findViewById(R.id.dialog_about_version);
+            versionTv.setText(String.format(getString(R.string.dialog_about_version),
+                    pInfo.versionName, pInfo.versionCode));
+        } catch (PackageManager.NameNotFoundException e) {
+            Debug.out(e);
+        }
+
+        TextView messageTv = (TextView) view.findViewById(R.id.dialog_about_message);
+        messageTv.setText(Html.fromHtml(getString(R.string.dialog_about_content)));
+        messageTv.setMovementMethod(LinkMovementMethod.getInstance());
 
         new AlertDialog.Builder(this)
                 .setView(view)
