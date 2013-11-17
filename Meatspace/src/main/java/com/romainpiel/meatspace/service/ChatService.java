@@ -84,6 +84,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                     @Override
                     public void run() {
                         final ChatList result = ApiManager.get().meatspace(ChatService.this).getChats();
+                        result.setFromNetwork(true);
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -138,7 +139,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                busManager.getChatBus().post(new ChatList(result));
+                                busManager.getChatBus().post(new ChatList(result, true));
                             }
                         });
 

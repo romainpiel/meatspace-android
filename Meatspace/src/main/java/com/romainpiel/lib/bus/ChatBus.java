@@ -38,6 +38,7 @@ public class ChatBus {
 
     public void post(ChatList items) {
         this.chatList.addAll(items.get());
+        this.chatList.setFromNetwork(true);
         bus.post(items);
     }
 

@@ -13,13 +13,16 @@ import java.util.TreeSet;
 public class ChatList {
 
     private Content chats;
+    private boolean fromNetwork;
 
     public ChatList() {
-        this(null);
+        this(null, false);
     }
 
-    public ChatList(Collection<Chat> chats) {
+    public ChatList(Collection<Chat> chats, boolean fromNetwork) {
         this.chats = new Content();
+        this.fromNetwork = fromNetwork;
+
         if (chats != null) {
             this.chats.addAll(chats);
         }
@@ -33,6 +36,14 @@ public class ChatList {
         if (chats != null && chats.get() != null) {
             chats.get().addAll(items);
         }
+    }
+
+    public boolean isFromNetwork() {
+        return fromNetwork;
+    }
+
+    public void setFromNetwork(boolean fromNetwork) {
+        this.fromNetwork = fromNetwork;
     }
 
     private static class Content {

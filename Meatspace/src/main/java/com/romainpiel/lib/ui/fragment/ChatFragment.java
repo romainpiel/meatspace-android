@@ -1,5 +1,6 @@
 package com.romainpiel.lib.ui.fragment;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -10,8 +11,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
-import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.api.ApiManager;
+import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.view.CameraPreview;
@@ -38,6 +39,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @InjectView(R.id.fragment_chat_input) EditText input;
     @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
 
+    private ProgressDialog progressDialog;
     private ChatAdapter adapter;
     private PreviewHelper previewHelper;
     private Handler uiHandler;
@@ -101,6 +103,12 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Subscribe
     public void onMessage(ChatList chatList) {
         notifyDatasetChanged(chatList, false);
+
+        if (chatList.isFromNetwork()) {
+            dismissProgressDialog();
+        } else {
+            showProgressDialog();
+        }
     }
 
     public void notifyDatasetChanged(final ChatList chatList, final boolean clearBefore) {
@@ -155,5 +163,20 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         input.setEnabled(true);
         sendBtn.setEnabled(true);
+    }
+
+    private void showProgressDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage(getString(R.string.chat_loading));
+            progressDialog.setCancelable(false);
+        }
+        progressDialog.show();
+    }
+
+    private void dismissProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 }
