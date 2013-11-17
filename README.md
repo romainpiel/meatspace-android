@@ -13,13 +13,13 @@ Check out the sources and submodules:
 
 To run the server on your machine, follow the instructions described [there](https://github.com/meatspaces/meatspace-chat).
 
-In the android project, edit the variable `url_api_debug` Meatspace/src/main/res/values/urls.xml:
+In the android project, edit the variable `url_api_debug` in `Meatspace/src/main/res/values/urls.xml`:
 
 ```xml
     <string name="url_api_debug">http://192.168.1.110:3000</string> // set your computer IP here
 ```
 
-List your keys in the file located at
+Create a file `keys.xml` located at `Meatspace/src/main/res/values/` and list the api keys:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
