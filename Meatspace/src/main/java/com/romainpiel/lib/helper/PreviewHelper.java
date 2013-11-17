@@ -142,6 +142,12 @@ public class PreviewHelper implements Camera.PreviewCallback {
         }
     }
 
+    public void cancelCapture() {
+        uiHandler.removeCallbacks(stopCaptureRunnable);
+        gifEncoder.finish();
+        prepareForNextCapture();
+    }
+
     public interface OnCaptureListener {
         public void onCaptureStarted();
         public void onCaptureComplete(byte[] gifData);

@@ -6,7 +6,7 @@ package com.romainpiel.model;
  * Date: 01/11/2013
  * Time: 17:33
  */
-public class Chat {
+public class Chat implements Comparable<Chat> {
 
     private String key;
     private Value value;
@@ -25,6 +25,17 @@ public class Chat {
 
     public void setValue(Value value) {
         this.value = value;
+    }
+
+    @Override
+    public int compareTo(Chat another) {
+        return compare(this, another);
+    }
+
+    public static int compare(Chat lhs, Chat rhs) {
+        long l = lhs.getValue().getCreated();
+        long r = rhs.getValue().getCreated();
+        return l < r ? -1 : (l == r ? 0 : 1);
     }
 
     public static class Value {

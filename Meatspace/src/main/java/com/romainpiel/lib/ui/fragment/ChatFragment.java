@@ -10,17 +10,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
-import com.romainpiel.lib.BusManager;
+import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.api.ApiManager;
-import com.romainpiel.lib.gif.GIFUtils;
 import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.view.CameraPreview;
-import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.model.ChatList;
-import com.romainpiel.model.ChatRequest;
 import com.romainpiel.model.Device;
 import com.squareup.otto.Subscribe;
 
@@ -36,8 +33,6 @@ import butterknife.Views;
  */
 public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureListener, CameraPreview.PreviewReadyCallback {
 
-    private static final String API_GET_CHAT_REQ_ID = "ChatFragment.GET_CHAT";
-
     @InjectView(R.id.fragment_chat_list) ListView listView;
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
     @InjectView(R.id.fragment_chat_input) EditText input;
@@ -45,12 +40,10 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     private ChatAdapter adapter;
     private PreviewHelper previewHelper;
-    private boolean initialized;
     private Handler uiHandler;
     private Device device;
 
     public ChatFragment() {
-        this.initialized = false;
         this.uiHandler = new Handler();
     }
 
@@ -79,10 +72,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
             device = new Device(getActivity());
         }
 
-        if (!initialized) {
-            fetchChat();
-        }
-
         listView.setAdapter(adapter);
     }
 
@@ -95,8 +84,11 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onPause() {
         super.onPause();
         cameraPreview.stopPreview();
-        BackgroundExecutor.cancelAll(API_GET_CHAT_REQ_ID, true);
         BusManager.get().getChatBus().unregister(this);
+        previewHelper.cancelCapture();
+
+        // clear adapter, it will be refilled by the bus producer
+        adapter.setItems(null);
     }
 
     @Override
@@ -109,24 +101,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Subscribe
     public void onMessage(ChatList chatList) {
         notifyDatasetChanged(chatList, false);
-    }
-
-    public void fetchChat() {
-        // TODO do that in the ChatService
-        BackgroundExecutor.execute(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        final ChatList chatList = ApiManager.get().meatspace().getChats();
-                        if (chatList != null) {
-                            notifyDatasetChanged(chatList, true);
-                            initialized = true;
-                        }
-                    }
-                },
-                API_GET_CHAT_REQ_ID,
-                null
-        );
     }
 
     public void notifyDatasetChanged(final ChatList chatList, final boolean clearBefore) {
@@ -151,7 +125,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
                     runBefore.run();
                 }
                 adapter.notifyDataSetChanged();
-                initialized = true;
             }
 
         });
@@ -171,13 +144,12 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Override
     public void onCaptureComplete(byte[] gifData) {
 
-        ChatRequest chatRequest = new ChatRequest(
-                "blahblahblah",
+        ApiManager.get().emit(
+                getActivity(),
                 UIUtils.getText(input),
-                GIFUtils.mediaFromGIFbytes(gifData),
+                gifData,
                 device.getId()
         );
-        BusManager.get().getChatBus().post(chatRequest);
 
         input.setText(null);
 

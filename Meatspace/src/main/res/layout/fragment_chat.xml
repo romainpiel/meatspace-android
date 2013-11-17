@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"/>
 
-        <ImageButton
+        <com.romainpiel.lib.ui.view.AlphaImageButton
                 android:id="@+id/fragment_chat_send"
                 android:layout_height="match_parent"
                 android:layout_width="wrap_content"

@@ -1,11 +1,15 @@
 package com.romainpiel.lib.api;
 
+import android.content.Context;
 import android.os.Handler;
 
 import com.google.gson.Gson;
 import com.koushikdutta.async.http.socketio.ConnectCallback;
 import com.koushikdutta.async.http.socketio.SocketIOClient;
+import com.romainpiel.lib.bus.BusManager;
+import com.romainpiel.lib.gif.GIFUtils;
 import com.romainpiel.meatspace.BuildConfig;
+import com.romainpiel.model.ChatRequest;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
@@ -34,7 +38,7 @@ public class ApiManager {
         return instance;
     }
 
-    public MeatspaceRestClient meatspace() {
+    public MeatspaceRestClient meatspace(Context context) {
         if (meatspaceRestClient == null) {
 
             jsonParser = getJsonParser();
@@ -42,7 +46,7 @@ public class ApiManager {
             RestAdapter restAdapter = new RestAdapter.Builder()
                     .setLogLevel(RestAdapter.LogLevel.BASIC)
                     .setConverter(new GsonConverter(jsonParser))
-                    .setServer(BuildConfig.MEATSPACE_BASE_URL)
+                    .setServer(context.getString(BuildConfig.MEATSPACE_BASE_URL))
                     .build();
 
             meatspaceRestClient = restAdapter.create(MeatspaceRestClient.class);
@@ -57,11 +61,21 @@ public class ApiManager {
         return jsonParser;
     }
 
-    public void connect(ConnectCallback callback) {
-        SocketIOClient.connect(BuildConfig.MEATSPACE_BASE_URL, callback, new Handler());
+    public void connect(Context context, ConnectCallback callback) {
+        SocketIOClient.connect(context.getString(BuildConfig.MEATSPACE_BASE_URL), callback, new Handler());
     }
 
     public void disconnect(SocketIOClient client) {
         client.disconnect();
+    }
+
+    public void emit(Context context, String text, byte[] picture, String fingerprint) {
+        ChatRequest chatRequest = new ChatRequest(
+                context.getString(BuildConfig.MEATSPACE_KEY),
+                text,
+                GIFUtils.mediaFromGIFbytes(picture),
+                fingerprint
+        );
+        BusManager.get().getChatBus().post(chatRequest);
     }
 }

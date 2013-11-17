@@ -9,3 +9,5 @@
 **/build/
 **/gen/
 local.properties
+
+Meatspace/src/main/res/values/keys.xml

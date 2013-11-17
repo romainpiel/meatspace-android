@@ -9,6 +9,7 @@ import com.romainpiel.lib.ui.view.ChatItemView;
 import com.romainpiel.model.Chat;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,14 +28,14 @@ public class ChatAdapter extends BaseAdapter {
         items = new ArrayList<Chat>();
     }
 
-    public void setItems(List<Chat> items) {
+    public void setItems(Collection<Chat> items) {
         this.items.clear();
         if (items != null) {
             this.items.addAll(items);
         }
     }
 
-    public void appendItems(List<Chat> items) {
+    public void appendItems(Collection<Chat> items) {
         this.items.addAll(items);
     }
 

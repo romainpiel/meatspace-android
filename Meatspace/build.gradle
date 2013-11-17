@@ -21,10 +21,6 @@ dependencies {
     compile 'com.squareup:otto:1.3.4'
 }
 
-def DEBUG_BASE_URL = "http://192.168.1.110:3000" // set your computer IP there
-def STAGING_BASE_URL = "http://chat-staging.meatspac.es/"
-def RELEASE_BASE_URL = "https://chat.meatspac.es"
-
 android {
     compileSdkVersion 19
     buildToolsVersion "19.0.0"
@@ -37,17 +33,20 @@ android {
     buildTypes {
         debug {
             buildConfig "public final static boolean IS_DEBUG = true;",
-                    "public final static String MEATSPACE_BASE_URL = \"" + DEBUG_BASE_URL + "\";"
+                    "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_debug;",
+                    "public final static int MEATSPACE_KEY = com.romainpiel.meatspace.R.string.key_api_debug;"
         }
         staging.initWith(buildTypes.debug)
         staging {
             buildConfig "public final static boolean IS_DEBUG = false;",
-                    "public final static String MEATSPACE_BASE_URL = \"" + STAGING_BASE_URL + "\";"
+                    "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_staging;",
+                    "public final static int MEATSPACE_KEY = com.romainpiel.meatspace.R.string.key_api_staging;"
         }
         release.initWith(buildTypes.debug)
         release {
             buildConfig "public final static boolean IS_DEBUG = false;",
-                    "public final static String MEATSPACE_BASE_URL = \"" + RELEASE_BASE_URL + "\";"
+                    "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_release;",
+                    "public final static int MEATSPACE_KEY = com.romainpiel.meatspace.R.string.key_api_release;"
         }
     }
 }

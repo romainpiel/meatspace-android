@@ -10,7 +10,7 @@ import com.koushikdutta.async.http.socketio.Acknowledge;
 import com.koushikdutta.async.http.socketio.ConnectCallback;
 import com.koushikdutta.async.http.socketio.EventCallback;
 import com.koushikdutta.async.http.socketio.SocketIOClient;
-import com.romainpiel.lib.BusManager;
+import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.lib.utils.Debug;
@@ -34,6 +34,8 @@ import java.util.List;
  */
 public class ChatService extends Service implements ConnectCallback, EventCallback {
 
+    private static final String API_GET_CHAT_REQ_ID = "ChatService.GET_CHAT";
+
     private ApiManager apiManager;
     private BusManager busManager;
     private SocketIOClient socketIOClient;
@@ -55,6 +57,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
             apiManager.disconnect(socketIOClient);
         }
         busManager.getChatBus().unregister(this);
+        BackgroundExecutor.cancelAll(API_GET_CHAT_REQ_ID, true);
         super.onDestroy();
     }
 
@@ -63,7 +66,8 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
 
         if (!initialized) {
             initialized = true;
-            apiManager.connect(this);
+            fetchChat();
+            apiManager.connect(this, this);
         }
 
         return START_STICKY;
@@ -72,6 +76,25 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    public void fetchChat() {
+        BackgroundExecutor.execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        final ChatList result = ApiManager.get().meatspace(ChatService.this).getChats();
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                busManager.getChatBus().post(result);
+                            }
+                        });
+                    }
+                },
+                API_GET_CHAT_REQ_ID,
+                null
+        );
     }
 
     @Override
