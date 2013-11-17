@@ -2,6 +2,8 @@
 
 An android client for the great chatting space [https://chat.meatspac.es](https://chat.meatspac.es).
 
+[![Available on Google Play](http://developer.android.com/images/brand/en_generic_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=com.romainpiel.meatspace)
+
 ## Setting up
 
 Check out the sources and submodules:
