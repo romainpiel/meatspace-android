@@ -316,7 +316,9 @@ public class BackgroundExecutor {
 
 			try {
 				execute();
-			} finally {
+			} catch (Exception e) {
+                Debug.out(e);
+            } finally {
 				/* handle next tasks */
 				postExecute();
 			}
