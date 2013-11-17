@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.romainpiel.Constants;
 import com.romainpiel.lib.gif.GIFDecode;
 
 import java.io.ByteArrayInputStream;
@@ -15,7 +16,7 @@ import java.io.ByteArrayInputStream;
 public class GIFView extends View {
 
     private Paint paint;
-	private GIFDecode decode;
+    private GIFDecode decode;
     private Rect src, dst;
 
     public GIFView(Context context) {
@@ -44,8 +45,8 @@ public class GIFView extends View {
         decode.read(new ByteArrayInputStream(bytes));
     }
 
-	@Override
-	protected void onDraw(Canvas canvas) {
+    @Override
+    protected void onDraw(Canvas canvas) {
         if (decode != null && decode.getFrameCount() > 0) {
 
             Bitmap bmp = decode.next();
@@ -58,13 +59,13 @@ public class GIFView extends View {
             int vWidth = getWidth();
             int vHeight = getHeight();
 
-            int width = portrait? bWidth : bHeight * vWidth / vHeight;
-            int height = portrait? bWidth * vHeight / vWidth : bHeight;
+            int width = portrait ? bWidth : bHeight * vWidth / vHeight;
+            int height = portrait ? bWidth * vHeight / vWidth : bHeight;
 
-            src.left = bWidth/2 - width/2;
-            src.top = bHeight/2 - height/2;
-            src.right = bWidth/2 + width/2;
-            src.bottom = bHeight/2 + height/2;
+            src.left = bWidth / 2 - width / 2;
+            src.top = bHeight / 2 - height / 2;
+            src.right = bWidth / 2 + width / 2;
+            src.bottom = bHeight / 2 + height / 2;
 
             dst.left = 0;
             dst.top = 0;
@@ -73,8 +74,9 @@ public class GIFView extends View {
 
             canvas.drawBitmap(bmp, src, dst, paint);
 
-            postInvalidateDelayed(150);
+            int delay = decode.getDelay(decode.getFrameindex());
+            postInvalidateDelayed(Math.max(delay, Constants.GIF_MIN_DELAY));
         }
-	}
+    }
 
 }

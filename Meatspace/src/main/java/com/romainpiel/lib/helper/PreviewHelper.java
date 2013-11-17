@@ -23,6 +23,8 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
     private Handler uiHandler;
     private int angle;
+    private long lastTick;
+    private int delay;
     private boolean capturing;
     private AnimatedGifEncoder gifEncoder;
     private Runnable stopCaptureRunnable;
@@ -31,24 +33,28 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
     public PreviewHelper(Handler uiHandler) {
         this.uiHandler = uiHandler;
-        this.capturing = false;
+
         this.stopCaptureRunnable = new Runnable() {
             @Override
             public void run() {
-                capturing = false;
 
+                if (delay != -1) {
+                    gifEncoder.setDelay(delay);
+                }
                 gifEncoder.finish();
 
                 if (onCaptureListener != null) {
                     onCaptureListener.onCaptureComplete(gifStream.toByteArray());
                 }
 
-                gifStream = null;
+                prepareForNextCapture();
             }
         };
+
         this.gifEncoder = new AnimatedGifEncoder();
-        this.gifEncoder.setDelay(150);
         this.gifEncoder.setRepeat(0);
+
+        prepareForNextCapture();
     }
 
     public boolean isCapturing() {
@@ -65,6 +71,13 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
     public void setOnCaptureListener(OnCaptureListener onCaptureListener) {
         this.onCaptureListener = onCaptureListener;
+    }
+
+    private void prepareForNextCapture() {
+        this.capturing = false;
+        this.lastTick = -1;
+        this.delay = -1;
+        this.gifStream = null;
     }
 
     public void capture() {
@@ -88,7 +101,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
     public void onPreviewFrame(byte[] data, Camera camera) {
         if (capturing) {
 
-            // TODO maybe do that in a separate thread
+            long now = System.currentTimeMillis();
 
             Camera.Parameters parameters = camera.getParameters();
             Camera.Size size = parameters.getPreviewSize();
@@ -120,6 +133,12 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
             rotatedBitmap.recycle();
             bitmap.recycle();
+
+            if (lastTick != -1 && delay == -1) {
+                delay = (int) (now - lastTick);
+            }
+
+            lastTick = now;
         }
     }
 
