@@ -34,6 +34,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private int centerPosY;
     private int angle;
     private boolean surfaceConfiguring = false;
+    private boolean previewIsRunning;
     private PreviewReadyCallback previewReadyCallback = null;
     private PreviewCallback previewCallback;
 
@@ -57,18 +58,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         layoutMode = mode;
         holder = getHolder();
         holder.addCallback(this);
-        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
-        int cameraId = findFrontFacingCamera();
-        if (cameraId < 0) {
-            camera = Camera.open();
-        } else {
-            camera = Camera.open(cameraId);
-        }
-
-        Camera.Parameters cameraParams = camera.getParameters();
-        previewSizeList = cameraParams.getSupportedPreviewSizes();
-        pictureSizeList = cameraParams.getSupportedPictureSizes();
     }
 
     private int findFrontFacingCamera() {
@@ -88,6 +77,18 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+
+        int cameraId = findFrontFacingCamera();
+        if (cameraId < 0) {
+            camera = Camera.open();
+        } else {
+            camera = Camera.open(cameraId);
+        }
+
+        Camera.Parameters cameraParams = camera.getParameters();
+        previewSizeList = cameraParams.getSupportedPreviewSizes();
+        pictureSizeList = cameraParams.getSupportedPictureSizes();
+
         try {
             camera.setPreviewDisplay(this.holder);
         } catch (IOException e) {
@@ -103,7 +104,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void doSurfaceChanged(int width, int height) {
-        camera.stopPreview();
+        stopPreview();
 
         camera.setPreviewCallback(previewCallback);
 
@@ -134,7 +135,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         surfaceConfiguring = false;
 
         try {
-            camera.startPreview();
+            startPreview();
         } catch (Exception e) {
 
             // Remove failed size
@@ -153,6 +154,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             previewReadyCallback.onPreviewReady();
         }
 
+    }
+
+    public void startPreview() {
+        if (!previewIsRunning && (camera != null)) {
+            camera.startPreview();
+            previewIsRunning = true;
+        }
+    }
+
+    public void stopPreview() {
+        if (previewIsRunning && (camera != null)) {
+            camera.stopPreview();
+            previewIsRunning = false;
+        }
     }
 
     /**
@@ -314,9 +329,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             return;
         }
 
-        camera.stopPreview();
+        stopPreview();
         camera.setPreviewCallback(null);
-        holder.removeCallback(this);
         camera.release();
         camera = null;
     }

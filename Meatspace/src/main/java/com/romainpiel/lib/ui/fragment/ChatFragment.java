@@ -94,6 +94,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Override
     public void onPause() {
         super.onPause();
+        cameraPreview.stopPreview();
         BackgroundExecutor.cancelAll(API_GET_CHAT_REQ_ID, true);
         BusManager.get().getChatBus().unregister(this);
     }
@@ -101,6 +102,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Override
     public void onResume() {
         super.onResume();
+        cameraPreview.startPreview();
         BusManager.get().getChatBus().register(this);
     }
 
