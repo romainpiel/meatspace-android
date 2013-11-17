@@ -21,7 +21,8 @@ dependencies {
     compile 'com.squareup:otto:1.3.4'
 }
 
-def DEBUG_BASE_URL = "http://192.168.1.90:3000" // set your computer IP there
+def DEBUG_BASE_URL = "http://192.168.1.110:3000" // set your computer IP there
+def STAGING_BASE_URL = "http://chat-staging.meatspac.es/"
 def RELEASE_BASE_URL = "https://chat.meatspac.es"
 
 android {
@@ -37,6 +38,11 @@ android {
         debug {
             buildConfig "public final static boolean IS_DEBUG = true;",
                     "public final static String MEATSPACE_BASE_URL = \"" + DEBUG_BASE_URL + "\";"
+        }
+        staging.initWith(buildTypes.debug)
+        staging {
+            buildConfig "public final static boolean IS_DEBUG = false;",
+                    "public final static String MEATSPACE_BASE_URL = \"" + STAGING_BASE_URL + "\";"
         }
         release.initWith(buildTypes.debug)
         release {
