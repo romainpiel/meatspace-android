@@ -35,10 +35,6 @@ android {
     }
 
     signingConfigs {
-        debug {
-            storeFile file("debug.keystore")
-        }
-
         release {
             storeFile file("meatspace.keystore")
             storePassword "meatspace"
