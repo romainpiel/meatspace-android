@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bugsense.trace.BugSenseHandler;
+import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.meatspace.service.ChatService;
 
@@ -26,6 +28,9 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!BuildConfig.IS_DEBUG) {
+            BugSenseHandler.initAndStartSession(this, getString(R.string.key_bugsense));
+        }
         setContentView(R.layout.activity_main);
 
         startService(new Intent(this, ChatService.class));
