@@ -2,6 +2,8 @@
     <string name="app_name">Meatspace</string>
     <string name="menu_main_about">About</string>
     <string name="chat_loading">Loading chat…</string>
+    <string name="chat_error_unreachable_title">Network error</string>
+    <string name="chat_error_unreachable_message">Meatspace is unreachable, please try again later.</string>
     <string name="dialog_about_version" formatted="false">Version: %s - %d</string>
     <string name="dialog_about_content"><![CDATA[
         <a href="https://chat.meatspac.es/">https://chat.meatspac.es/</a><br/>

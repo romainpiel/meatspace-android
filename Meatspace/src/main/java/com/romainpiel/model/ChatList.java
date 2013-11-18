@@ -13,7 +13,6 @@ import java.util.TreeSet;
 public class ChatList {
 
     private Content chats;
-    private boolean fromNetwork;
 
     public ChatList() {
         this(null);
@@ -37,12 +36,10 @@ public class ChatList {
         }
     }
 
-    public boolean isFromNetwork() {
-        return fromNetwork;
-    }
-
-    public void setFromNetwork(boolean fromNetwork) {
-        this.fromNetwork = fromNetwork;
+    public void clear() {
+        if (chats != null && chats.get() != null) {
+            chats.get().clear();
+        }
     }
 
     private static class Content {

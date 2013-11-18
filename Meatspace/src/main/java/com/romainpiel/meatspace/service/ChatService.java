@@ -10,13 +10,16 @@ import com.koushikdutta.async.http.socketio.Acknowledge;
 import com.koushikdutta.async.http.socketio.ConnectCallback;
 import com.koushikdutta.async.http.socketio.EventCallback;
 import com.koushikdutta.async.http.socketio.SocketIOClient;
-import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.api.ApiManager;
+import com.romainpiel.lib.api.IOState;
+import com.romainpiel.lib.bus.BusManager;
+import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
 import com.romainpiel.model.ChatRequest;
+import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
 import org.json.JSONArray;
@@ -40,15 +43,21 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     private BusManager busManager;
     private SocketIOClient socketIOClient;
     private Handler handler;
-    private boolean initialized;
+    private ChatList chatList;
+    private IOState ioState;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
         apiManager = ApiManager.get();
         busManager = BusManager.get();
-        busManager.getChatBus().register(this);
         handler = new Handler();
+
+        ioState = IOState.DISCONNECTED;
+        chatList = new ChatList();
+
+        busManager.getChatBus().register(this);
     }
 
     @Override
@@ -64,8 +73,12 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
 
-        if (!initialized) {
-            initialized = true;
+        if (ioState.equals(IOState.DISCONNECTED)) {
+            ioState = IOState.CONNECTING;
+
+            // TODO avoid this and handle duplicates inside this class
+            chatList.clear();
+
             fetchChat();
             apiManager.connect(this, this);
         }
@@ -87,7 +100,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                busManager.getChatBus().post(result);
+                                post(result);
                             }
                         });
                     }
@@ -101,12 +114,17 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     public void onConnectCompleted(Exception ex, SocketIOClient client) {
 
         if (ex != null) {
+            ioState = IOState.ERROR;
+            post();
             return;
         }
+
+        ioState = IOState.CONNECTED;
 
         socketIOClient = client;
         socketIOClient.addListener(ApiManager.EVENT_MESSAGE, this);
 
+        produce();
     }
 
     @Override
@@ -129,7 +147,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                             object = argument.getJSONObject(i);
                             jsonChat = (JSONObject) object.get("chat");
 
-                            // TODO try to use strings form the very beginning...
+                            // TODO try to use strings from the very beginning...
                             chat = jsonParser.fromJson(jsonChat.toString(), Chat.class);
 
                             result.add(chat);
@@ -138,7 +156,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                busManager.getChatBus().post(new ChatList(result));
+                                post(new ChatList(result));
                             }
                         });
 
@@ -158,5 +176,19 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
             // 4 : json type (? not sure why)
             socketIOClient.emitRaw(4, jsonParser.toJson(chatRequest), null);
         }
+    }
+
+    public void post(ChatList items) {
+        this.chatList.addAll(items.get());
+        post();
+    }
+
+    public void post() {
+        this.busManager.getChatBus().post(produce());
+    }
+
+    @Produce
+    public ChatEvent produce() {
+        return new ChatEvent(ioState, chatList);
     }
 }
