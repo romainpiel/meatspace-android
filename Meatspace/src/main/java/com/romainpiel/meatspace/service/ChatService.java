@@ -1,9 +1,12 @@
 package com.romainpiel.meatspace.service;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 
 import com.google.gson.Gson;
 import com.koushikdutta.async.http.socketio.Acknowledge;
@@ -16,6 +19,8 @@ import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.lib.utils.Debug;
+import com.romainpiel.meatspace.R;
+import com.romainpiel.meatspace.activity.MainActivity;
 import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
 import com.romainpiel.model.ChatRequest;
@@ -38,6 +43,7 @@ import java.util.List;
 public class ChatService extends Service implements ConnectCallback, EventCallback {
 
     private static final String API_GET_CHAT_REQ_ID = "ChatService.GET_CHAT";
+    private static final int CHAT_NOTIF_ID = 1234;
 
     private ApiManager apiManager;
     private BusManager busManager;
@@ -114,8 +120,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     public void onConnectCompleted(Exception ex, SocketIOClient client) {
 
         if (ex != null) {
-            ioState = IOState.ERROR;
-            post();
+            postError();
             return;
         }
 
@@ -124,7 +129,24 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         socketIOClient = client;
         socketIOClient.addListener(ApiManager.EVENT_MESSAGE, this);
 
-        produce();
+        PendingIntent pi =
+                PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        builder.setContentIntent(pi)
+                .setWhen(System.currentTimeMillis())
+                .setAutoCancel(true)
+                .setContentTitle(getString(R.string.service_chat_running))
+                .setContentText(getString(R.string.service_chat_running_description));
+
+        Notification note = builder.build();
+
+        note.flags |= Notification.FLAG_NO_CLEAR;
+
+        startForeground(CHAT_NOTIF_ID, note);
+
+        post();
     }
 
     @Override
@@ -170,12 +192,19 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
 
     @Subscribe
     public void onEvent(ChatRequest chatRequest) {
-        if (socketIOClient != null) {
+        if (socketIOClient != null && socketIOClient.isConnected()) {
             Gson jsonParser = apiManager.getJsonParser();
 
             // 4 : json type (? not sure why)
             socketIOClient.emitRaw(4, jsonParser.toJson(chatRequest), null);
+        } else {
+            postError();
         }
+    }
+
+    public void postError() {
+        ioState = IOState.ERROR;
+        post();
     }
 
     public void post(ChatList items) {
@@ -184,7 +213,9 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     }
 
     public void post() {
-        this.busManager.getChatBus().post(produce());
+        Debug.out(ioState);
+        Debug.out(Debug.getCallingMethodInfo());
+        this.busManager.getChatBus().post(new ChatEvent(ioState, chatList));
     }
 
     @Produce

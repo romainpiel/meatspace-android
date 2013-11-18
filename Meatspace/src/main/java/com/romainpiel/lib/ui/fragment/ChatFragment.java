@@ -3,6 +3,7 @@ package com.romainpiel.lib.ui.fragment;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -20,8 +21,10 @@ import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.view.CameraPreview;
+import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.R;
+import com.romainpiel.meatspace.service.ChatService;
 import com.romainpiel.model.ChatList;
 import com.romainpiel.model.Device;
 import com.squareup.otto.Subscribe;
@@ -107,6 +110,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     @Subscribe
     public void onMessage(ChatEvent event) {
+        Debug.out("onMessage");
         notifyDatasetChanged(event.getChatList());
 
         switch (event.getIoState()) {
@@ -194,14 +198,14 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     private void cancelProgressDialog(String title, String message) {
         dismissProgressDialog();
         if (TextUtils.isEmpty(message)) {
-            getActivity().finish();
+            forceFinish();
         } else {
             if (errorDialog == null) {
                 errorDialog = new AlertDialog.Builder(getActivity())
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                getActivity().finish();
+                                forceFinish();
                             }
                         })
                         .setCancelable(false)
@@ -218,5 +222,10 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
+    }
+
+    private void forceFinish() {
+        getActivity().stopService(new Intent(getActivity(), ChatService.class));
+        getActivity().finish();
     }
 }

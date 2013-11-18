@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.romainpiel.Constants;
+import com.romainpiel.meatspace.BuildConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +26,7 @@ import java.util.Set;
  */
 public class Debug {
 
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = BuildConfig.IS_DEBUG;
 
     /**
      * Sets if the app is in debug mode.

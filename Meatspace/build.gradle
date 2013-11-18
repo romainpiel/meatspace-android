@@ -51,7 +51,7 @@ android {
         }
         staging.initWith(buildTypes.debug)
         staging {
-            buildConfig "public final static boolean IS_DEBUG = false;",
+            buildConfig "public final static boolean IS_DEBUG = true;",
                     "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_staging;",
                     "public final static int MEATSPACE_KEY = com.romainpiel.meatspace.R.string.key_api_staging;"
             debuggable false

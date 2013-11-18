@@ -40,12 +40,6 @@ public class MainActivity extends FragmentActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        stopService(new Intent(this, ChatService.class));
-        super.onDestroy();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
