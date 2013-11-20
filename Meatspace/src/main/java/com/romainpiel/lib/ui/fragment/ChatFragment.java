@@ -110,7 +110,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     @Subscribe
     public void onMessage(ChatEvent event) {
-        Debug.out("onMessage");
         notifyDatasetChanged(event.getChatList());
 
         switch (event.getIoState()) {

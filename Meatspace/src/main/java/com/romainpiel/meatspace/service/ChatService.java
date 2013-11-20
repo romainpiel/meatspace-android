@@ -117,36 +117,41 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     }
 
     @Override
-    public void onConnectCompleted(Exception ex, SocketIOClient client) {
+    public void onConnectCompleted(final Exception ex, final SocketIOClient client) {
 
-        if (ex != null) {
-            postError();
-            return;
-        }
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (ex != null) {
+                    postError();
+                    return;
+                }
 
-        ioState = IOState.CONNECTED;
+                ioState = IOState.CONNECTED;
 
-        socketIOClient = client;
-        socketIOClient.addListener(ApiManager.EVENT_MESSAGE, this);
+                socketIOClient = client;
+                socketIOClient.addListener(ApiManager.EVENT_MESSAGE, ChatService.this);
 
-        PendingIntent pi =
-                PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pi =
+                        PendingIntent.getActivity(ChatService.this, 0, new Intent(ChatService.this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(ChatService.this);
 
-        builder.setContentIntent(pi)
-                .setWhen(System.currentTimeMillis())
-                .setAutoCancel(true)
-                .setContentTitle(getString(R.string.service_chat_running))
-                .setContentText(getString(R.string.service_chat_running_description));
+                builder.setContentIntent(pi)
+                        .setWhen(System.currentTimeMillis())
+                        .setAutoCancel(true)
+                        .setContentTitle(getString(R.string.service_chat_running))
+                        .setContentText(getString(R.string.service_chat_running_description));
 
-        Notification note = builder.build();
+                Notification note = builder.build();
 
-        note.flags |= Notification.FLAG_NO_CLEAR;
+                note.flags |= Notification.FLAG_NO_CLEAR;
 
-        startForeground(CHAT_NOTIF_ID, note);
+                startForeground(CHAT_NOTIF_ID, note);
 
-        post();
+                post();
+            }
+        });
     }
 
     @Override
@@ -213,8 +218,6 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     }
 
     public void post() {
-        Debug.out(ioState);
-        Debug.out(Debug.getCallingMethodInfo());
         this.busManager.getChatBus().post(new ChatEvent(ioState, chatList));
     }
 
