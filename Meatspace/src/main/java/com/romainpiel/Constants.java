@@ -16,4 +16,8 @@ public class Constants {
     public static final int GIF_MIN_DELAY = 100;
 
     public static final String PREF_KEY_DEVICE_ID = "PREF_KEY_DEVICE_ID";
+
+    public static final int NOTIFICICATION_ID_CHAT = 1000;
+
+    public static final String FILTER_CHAT_CLOSE = "FILTER_CHAT_CLOSE";
 }

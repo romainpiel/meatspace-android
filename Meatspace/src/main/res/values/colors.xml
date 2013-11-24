@@ -9,6 +9,8 @@
     <color name="ms_button_bg">#00000000</color>
     <color name="ms_item_fg_pressed">#33f8bed5</color>
     <color name="ms_item_fg">#00000000</color>
+    <color name="ms_notif_button_bg_pressed">#33f8bed5</color>
+    <color name="ms_notif_button_bg">#00000000</color>
     <color name="ms_item_timestamp">#ff929292</color>
     <color name="ms_item_message">#ff000000</color>
 </resources>

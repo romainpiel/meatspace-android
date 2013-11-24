@@ -1,9 +1,13 @@
 package com.romainpiel.lib.ui.fragment;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +17,13 @@ import android.widget.ListView;
 
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.bus.BusManager;
+import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.view.CameraPreview;
 import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.R;
+import com.romainpiel.meatspace.service.ChatService;
 import com.romainpiel.model.ChatList;
 import com.romainpiel.model.Device;
 import com.squareup.otto.Subscribe;
@@ -40,6 +46,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
 
     private ProgressDialog progressDialog;
+    private AlertDialog errorDialog;
     private ChatAdapter adapter;
     private PreviewHelper previewHelper;
     private Handler uiHandler;
@@ -101,13 +108,29 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     }
 
     @Subscribe
-    public void onMessage(ChatList chatList) {
-        notifyDatasetChanged(chatList);
+    public void onMessage(ChatEvent event) {
+        notifyDatasetChanged(event.getChatList());
 
-        if (chatList.isFromNetwork()) {
-            dismissProgressDialog();
-        } else {
-            showProgressDialog();
+        switch (event.getIoState()) {
+            case IDLE:
+                showProgressDialog();
+                break;
+            case CONNECTING:
+                showProgressDialog();
+                break;
+            case CONNECTED:
+                dismissProgressDialog();
+                break;
+            case DISCONNECTED:
+                cancelProgressDialog(
+                        getString(R.string.chat_error_app_closed),
+                        getString(R.string.chat_error_app_closed_message));
+                break;
+            case ERROR:
+                cancelProgressDialog(
+                        getString(R.string.chat_error_unreachable_title),
+                        getString(R.string.chat_error_unreachable_message));
+                break;
         }
     }
 
@@ -165,14 +188,55 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage(getString(R.string.chat_loading));
-            progressDialog.setCancelable(false);
+            progressDialog.setCancelable(true);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    cancelProgressDialog(null, null);
+                }
+            });
         }
         progressDialog.show();
+    }
+
+    private void cancelProgressDialog(String title, String message) {
+        dismissProgressDialog();
+        if (TextUtils.isEmpty(message)) {
+            forceFinish();
+        } else {
+            if (errorDialog == null) {
+                errorDialog = new AlertDialog.Builder(getActivity())
+                        .setPositiveButton(R.string.chat_error_connect, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ChatService.start(getActivity());
+                            }
+                        })
+                        .setNegativeButton(R.string.chat_error_leave, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                forceFinish();
+                            }
+                        })
+                        .setCancelable(false)
+                        .create();
+            }
+
+            errorDialog.setTitle(title);
+            errorDialog.setMessage(message);
+            errorDialog.show();
+        }
     }
 
     private void dismissProgressDialog() {
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
+    }
+
+    private void forceFinish() {
+        getActivity().stopService(new Intent(getActivity(), ChatService.class));
+        getActivity().finish();
     }
 }

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:internal="http://schemas.android.com/apk/prv/res/android"
+              android:id="@+id/status_bar_latest_event_content"
+              android:layout_width="match_parent"
+              android:layout_height="64dp"
+              internal:layout_minHeight="64dp"
+              internal:layout_maxHeight="64dp"
+        >
+
+    <ImageView
+            android:id="@+id/notification_template_icon"
+            android:layout_width="@android:dimen/notification_large_icon_width"
+            android:layout_height="@android:dimen/notification_large_icon_height"
+            android:scaleType="center"
+            android:src="@drawable/ic_launcher"
+            />
+
+    <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="fill_vertical"
+            android:minHeight="@android:dimen/notification_large_icon_height"
+            android:orientation="vertical"
+            android:paddingEnd="8dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:gravity="top"
+            >
+
+        <TextView
+                android:id="@+id/notification_template_title"
+                android:textAppearance="@style/Meatspace.TextAppearance.StatusBar.EventContent.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:fadingEdge="horizontal"
+                android:paddingTop="6dp"
+                android:layout_marginStart="8dp"
+                />
+
+        <TextView
+                android:id="@+id/notification_template_text2"
+                android:textAppearance="@style/Meatspace.TextAppearance.StatusBar.EventContent.Line2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-2dp"
+                android:layout_marginBottom="-2dp"
+                android:layout_marginStart="8dp"
+                android:singleLine="true"
+                android:fadingEdge="horizontal"
+                android:ellipsize="marquee"
+                />
+
+    </LinearLayout>
+
+    <ImageButton
+            android:id="@+id/notification_template_cancel"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/notif_button_bg_ms"
+            android:src="@drawable/notif_ic_close"/>
+
+</LinearLayout>
