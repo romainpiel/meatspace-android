@@ -139,15 +139,16 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
             @Override
             public void run() {
                 adapter.setItems(chatList.get());
-                UIUtils.scrollToBottom(listView, adapter);
             }
         });
     }
 
     public void notifyDatasetChanged(final Runnable runBefore) {
+
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
+
                 if (runBefore != null) {
                     runBefore.run();
                 }
