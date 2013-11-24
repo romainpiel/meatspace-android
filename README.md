@@ -42,6 +42,12 @@ To start the android app in debug mode, run that from the android project folder
 > ./gradlew installRelease
 ```
 
+## Contribute
+
+If you like the project the project and you have great ideas of new features/enhancements, just fork the project and post your PR.
+
+You can also post new tickets [over there](https://github.com/RomainPiel/meatspace-android/issues), that would be very appreciated too.
+
 ## Libraries used
 
 Thanks to the creators/contributors of all of these open-source libraries:
