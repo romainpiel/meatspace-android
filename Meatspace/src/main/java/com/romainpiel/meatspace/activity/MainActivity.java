@@ -1,7 +1,6 @@
 package com.romainpiel.meatspace.activity;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -36,7 +35,7 @@ public class MainActivity extends FragmentActivity {
         }
         setContentView(R.layout.activity_main);
 
-        startService(new Intent(this, ChatService.class));
+        ChatService.start(this);
     }
 
     @Override

@@ -3,16 +3,21 @@ package com.romainpiel.meatspace.service;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.widget.RemoteViews;
 
 import com.google.gson.Gson;
 import com.koushikdutta.async.http.socketio.Acknowledge;
 import com.koushikdutta.async.http.socketio.ConnectCallback;
 import com.koushikdutta.async.http.socketio.EventCallback;
 import com.koushikdutta.async.http.socketio.SocketIOClient;
+import com.romainpiel.Constants;
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.api.IOState;
 import com.romainpiel.lib.bus.BusManager;
@@ -43,14 +48,18 @@ import java.util.List;
 public class ChatService extends Service implements ConnectCallback, EventCallback {
 
     private static final String API_GET_CHAT_REQ_ID = "ChatService.GET_CHAT";
-    private static final int CHAT_NOTIF_ID = 1234;
 
     private ApiManager apiManager;
     private BusManager busManager;
+    private BroadcastReceiver closeChatReceiver;
     private SocketIOClient socketIOClient;
     private Handler handler;
     private ChatList chatList;
     private IOState ioState;
+
+    public static void start(Context context) {
+        context.startService(new Intent(context, ChatService.class));
+    }
 
     @Override
     public void onCreate() {
@@ -60,10 +69,20 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         busManager = BusManager.get();
         handler = new Handler();
 
-        ioState = IOState.DISCONNECTED;
+        ioState = IOState.IDLE;
         chatList = new ChatList();
 
         busManager.getChatBus().register(this);
+
+        closeChatReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ioState = IOState.DISCONNECTED;
+                post();
+                context.stopService(new Intent(context, ChatService.class));
+            }
+        };
+        registerReceiver(closeChatReceiver, new IntentFilter(Constants.FILTER_CHAT_CLOSE));
     }
 
     @Override
@@ -72,6 +91,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
             apiManager.disconnect(socketIOClient);
         }
         busManager.getChatBus().unregister(this);
+        unregisterReceiver(closeChatReceiver);
         BackgroundExecutor.cancelAll(API_GET_CHAT_REQ_ID, true);
         super.onDestroy();
     }
@@ -79,7 +99,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
 
-        if (ioState.equals(IOState.DISCONNECTED)) {
+        if (!ioState.equals(IOState.CONNECTING) && !ioState.equals(IOState.CONNECTED)) {
             ioState = IOState.CONNECTING;
 
             // TODO avoid this and handle duplicates inside this class
@@ -132,26 +152,37 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                 socketIOClient = client;
                 socketIOClient.addListener(ApiManager.EVENT_MESSAGE, ChatService.this);
 
-                PendingIntent pi =
-                        PendingIntent.getActivity(ChatService.this, 0, new Intent(ChatService.this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(ChatService.this);
-
-                builder.setContentIntent(pi)
-                        .setWhen(System.currentTimeMillis())
-                        .setAutoCancel(true)
-                        .setContentTitle(getString(R.string.service_chat_running))
-                        .setContentText(getString(R.string.service_chat_running_description));
-
-                Notification note = builder.build();
-
-                note.flags |= Notification.FLAG_NO_CLEAR;
-
-                startForeground(CHAT_NOTIF_ID, note);
+                showForeground();
 
                 post();
             }
         });
+    }
+
+    private void showForeground() {
+
+        Intent openIntent = new Intent(this, MainActivity.class);
+        openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent pi =
+                PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification_template);
+        notificationView.setTextViewText(R.id.notification_template_title, getString(R.string.service_chat_running));
+        notificationView.setTextViewText(R.id.notification_template_text2, getString(R.string.service_chat_running_description));
+        notificationView.setOnClickPendingIntent(R.id.notification_template_cancel,
+                PendingIntent.getBroadcast(this, 0, new Intent(Constants.FILTER_CHAT_CLOSE), 0));
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        Notification notification = builder.setContentIntent(pi)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContent(notificationView)
+                .build();
+
+        notification.flags |= Notification.FLAG_NO_CLEAR;
+
+        startForeground(Constants.NOTIFICICATION_ID_CHAT, notification);
     }
 
     @Override

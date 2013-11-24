@@ -21,7 +21,6 @@ import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.view.CameraPreview;
-import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.meatspace.service.ChatService;
@@ -113,7 +112,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         notifyDatasetChanged(event.getChatList());
 
         switch (event.getIoState()) {
-            case DISCONNECTED:
+            case IDLE:
                 showProgressDialog();
                 break;
             case CONNECTING:
@@ -122,8 +121,15 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
             case CONNECTED:
                 dismissProgressDialog();
                 break;
+            case DISCONNECTED:
+                cancelProgressDialog(
+                        getString(R.string.chat_error_app_closed),
+                        getString(R.string.chat_error_app_closed_message));
+                break;
             case ERROR:
-                cancelProgressDialog(getString(R.string.chat_error_unreachable_title), getString(R.string.chat_error_unreachable_message));
+                cancelProgressDialog(
+                        getString(R.string.chat_error_unreachable_title),
+                        getString(R.string.chat_error_unreachable_message));
                 break;
         }
     }
@@ -201,7 +207,13 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         } else {
             if (errorDialog == null) {
                 errorDialog = new AlertDialog.Builder(getActivity())
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.chat_error_connect, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ChatService.start(getActivity());
+                            }
+                        })
+                        .setNegativeButton(R.string.chat_error_leave, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 forceFinish();

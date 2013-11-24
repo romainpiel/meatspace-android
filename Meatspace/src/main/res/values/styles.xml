@@ -35,4 +35,20 @@
         <item name="android:paddingRight">0dp</item>
     </style>
 
+    <style name="Meatspace.TextAppearance"/>
+    <style name="Meatspace.TextAppearance.StatusBar"/>
+    <style name="Meatspace.TextAppearance.StatusBar.EventContent">
+        <item name="android:textColor">#999999</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="Meatspace.TextAppearance.StatusBar.EventContent.Title">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Meatspace.TextAppearance.StatusBar.EventContent.Line2">
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>

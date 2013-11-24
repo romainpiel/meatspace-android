@@ -6,6 +6,10 @@
     <string name="chat_loading">Loading chat…</string>
     <string name="chat_error_unreachable_title">Network error</string>
     <string name="chat_error_unreachable_message">Meatspace is unreachable, please try again later.</string>
+    <string name="chat_error_app_closed">Chat disconnected</string>
+    <string name="chat_error_app_closed_message">You got disconnected from the chat!</string>
+    <string name="chat_error_connect">Connect</string>
+    <string name="chat_error_leave">Leave</string>
     <string name="dialog_about_version" formatted="false">Version: %s - %d</string>
     <string name="dialog_about_content"><![CDATA[
         <a href="https://chat.meatspac.es/">https://chat.meatspac.es/</a><br/>
