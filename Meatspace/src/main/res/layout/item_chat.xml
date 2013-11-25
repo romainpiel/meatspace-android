@@ -2,7 +2,7 @@
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.romainpiel.lib.ui.view.GIFView
+    <ImageView
             android:id="@+id/item_chat_gif"
             android:layout_height="100dp"
             android:layout_width="100dp"/>
@@ -18,7 +18,6 @@
                 android:layout_width="wrap_content"
                 android:textColor="@color/ms_item_timestamp"
                 android:textAppearance="?android:attr/textAppearanceSmall"/>
-
         <TextView
                 android:id="@+id/item_chat_message"
                 android:layout_height="wrap_content"
