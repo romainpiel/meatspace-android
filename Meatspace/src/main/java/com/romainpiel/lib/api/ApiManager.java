@@ -11,9 +11,6 @@ import com.romainpiel.lib.gif.GIFUtils;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.model.ChatRequest;
 
-import retrofit.RestAdapter;
-import retrofit.converter.GsonConverter;
-
 /**
  * Meatspace
  * User: romainpiel
@@ -26,7 +23,6 @@ public class ApiManager {
 
     private static ApiManager instance;
 
-    private MeatspaceRestClient meatspaceRestClient;
     private Gson jsonParser;
 
     private ApiManager() {}
@@ -36,22 +32,6 @@ public class ApiManager {
             instance = new ApiManager();
         }
         return instance;
-    }
-
-    public MeatspaceRestClient meatspace(Context context) {
-        if (meatspaceRestClient == null) {
-
-            jsonParser = getJsonParser();
-
-            RestAdapter restAdapter = new RestAdapter.Builder()
-                    .setLogLevel(RestAdapter.LogLevel.BASIC)
-                    .setConverter(new GsonConverter(jsonParser))
-                    .setServer(context.getString(BuildConfig.MEATSPACE_BASE_URL))
-                    .build();
-
-            meatspaceRestClient = restAdapter.create(MeatspaceRestClient.class);
-        }
-        return meatspaceRestClient;
     }
 
     public Gson getJsonParser() {

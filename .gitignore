@@ -8,6 +8,7 @@
 # Android
 **/build/
 **/gen/
+**/obj/
 local.properties
 
 Meatspace/src/main/res/values/keys.xml

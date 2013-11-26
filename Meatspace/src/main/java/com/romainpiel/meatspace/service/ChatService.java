@@ -105,7 +105,6 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
             // TODO avoid this and handle duplicates inside this class
             chatList.clear();
 
-            fetchChat();
             apiManager.connect(this, this);
         }
 
@@ -115,25 +114,6 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    public void fetchChat() {
-        BackgroundExecutor.execute(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        final ChatList result = ApiManager.get().meatspace(ChatService.this).getChats();
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                post(result);
-                            }
-                        });
-                    }
-                },
-                API_GET_CHAT_REQ_ID,
-                null
-        );
     }
 
     @Override

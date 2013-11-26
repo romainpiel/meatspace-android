@@ -4,20 +4,23 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.romainpiel.lib.gif.GIFUtils;
 import com.romainpiel.lib.ui.helper.InflateHelper;
 import com.romainpiel.lib.ui.listener.OnViewChangedListener;
-import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.model.Chat;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Date;
 
 import butterknife.InjectView;
 import butterknife.Views;
+import pl.droidsonroids.gif.GifDrawable;
 
 /**
  * Meatspace
@@ -30,7 +33,7 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
     InflateHelper inflateHelper;
     Drawable foregroundSelector;
 
-    @InjectView(R.id.item_chat_gif) GIFView gif;
+    @InjectView(R.id.item_chat_gif) ImageView gif;
     @InjectView(R.id.item_chat_timestamp) TextView timestamp;
     @InjectView(R.id.item_chat_message) TextView message;
 
@@ -69,11 +72,19 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
 
             Chat.Value value = chat.getValue();
 
+//            try {
+//                gif.setImage(GIFUtils.mediaToGIFbytes(value.getMedia()));
+//            } catch (IllegalArgumentException e) {
+//                // the gif could not be decoded
+//                Debug.out(e);
+//            }
+
             try {
-                gif.setImage(GIFUtils.mediaToGIFbytes(value.getMedia()));
-            } catch (IllegalArgumentException e) {
-                // the gif could not be decoded
-                Debug.out(e);
+                ByteArrayInputStream in = new ByteArrayInputStream(GIFUtils.mediaToGIFbytes(value.getMedia()));
+                GifDrawable gifFromStream = new GifDrawable(in);
+                gif.setImageDrawable(gifFromStream);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
             Date date = new Date(value.getCreated());
