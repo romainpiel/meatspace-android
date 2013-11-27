@@ -21,7 +21,6 @@
 
         <activity
                 android:name=".activity.MainActivity"
-                android:hardwareAccelerated="false"
                 android:launchMode= "singleInstance"
                 android:label="Meatspace">
             <intent-filter>
