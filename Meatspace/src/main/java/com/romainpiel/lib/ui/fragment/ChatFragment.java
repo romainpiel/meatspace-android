@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -40,6 +41,8 @@ import butterknife.Views;
  */
 public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureListener, CameraPreview.PreviewReadyCallback {
 
+    private static final String STATE_LISTVIEW = "state_listview";
+
     @InjectView(R.id.fragment_chat_list) ListView listView;
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
     @InjectView(R.id.fragment_chat_input) EditText input;
@@ -51,6 +54,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     private PreviewHelper previewHelper;
     private Handler uiHandler;
     private Device device;
+    private Parcelable listViewState;
 
     public ChatFragment() {
         this.uiHandler = new Handler();
@@ -73,6 +77,10 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            listViewState = savedInstanceState.getParcelable(STATE_LISTVIEW);
+        }
+
         if (adapter == null) {
             adapter = new ChatAdapter(getActivity());
         }
@@ -82,6 +90,14 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         }
 
         listView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Parcelable state = listView.onSaveInstanceState();
+        outState.putParcelable(STATE_LISTVIEW, state);
     }
 
     @Override
@@ -95,9 +111,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         cameraPreview.stopPreview();
         BusManager.get().getChatBus().unregister(this);
         previewHelper.cancelCapture();
-
-        // clear adapter, it will be refilled by the bus producer
-        adapter.setItems(null);
     }
 
     @Override
@@ -135,6 +148,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     }
 
     public void notifyDatasetChanged(final ChatList chatList) {
+
         notifyDatasetChanged(new Runnable() {
             @Override
             public void run() {
@@ -153,6 +167,11 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
                     runBefore.run();
                 }
                 adapter.notifyDataSetChanged();
+
+                if (listViewState != null) {
+                    listView.onRestoreInstanceState(listViewState);
+                    listViewState = null;
+                }
             }
 
         });
