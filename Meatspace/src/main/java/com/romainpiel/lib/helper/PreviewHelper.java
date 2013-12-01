@@ -114,20 +114,21 @@ public class PreviewHelper implements Camera.PreviewCallback {
             Bitmap bitmap = BitmapFactory.decodeByteArray(output.toByteArray(), 0, output.size());
 
             boolean realSized = angle % 180 == 0;
-            float realW = realSized? image.getWidth() : image.getHeight();
-            float realH = realSized? image.getHeight() : image.getWidth();
+
+            float ratio = Constants.CAPTURE_WIDTH / Constants.CAPTURE_HEIGHT;
+
+            float srcWidth = realSized? image.getWidth() : (float) image.getHeight() / ratio;
+            float srcHeight = realSized? (float) image.getWidth() / ratio : image.getHeight();
+
+            float scaleFactor = realSized? Constants.CAPTURE_WIDTH / image.getWidth() : Constants.CAPTURE_WIDTH / image.getHeight();
 
             Matrix matrix = new Matrix();
             matrix.postRotate(-angle);
+            matrix.postScale(scaleFactor, scaleFactor);
 
-            if (realW > realH) {
-                matrix.postScale(Constants.CAPTURE_WIDTH / realW, Constants.CAPTURE_WIDTH / realW);
-            } else {
-                matrix.postScale(Constants.CAPTURE_HEIGHT / realH, Constants.CAPTURE_HEIGHT / realH);
-            }
-
-            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
-                    image.getWidth(), image.getHeight(), matrix, true);
+            int startX = realSized? 0 : Math.max(0, (image.getWidth() - image.getHeight()) / 2);
+            int startY = realSized? Math.max(0, (image.getHeight() - image.getWidth())) / 2 : 0;
+            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, startX, startY, (int) srcWidth, (int) srcHeight, matrix, true);
 
             gifEncoder.addFrame(rotatedBitmap);
 
@@ -150,6 +151,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
     public interface OnCaptureListener {
         public void onCaptureStarted();
+
         public void onCaptureComplete(byte[] gifData);
     }
 }

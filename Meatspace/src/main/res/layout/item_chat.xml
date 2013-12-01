@@ -4,8 +4,8 @@
 
     <ImageView
             android:id="@+id/item_chat_gif"
-            android:layout_height="100dp"
-            android:layout_width="100dp"/>
+            android:layout_height="@dimen/gif_height"
+            android:layout_width="@dimen/gif_width"/>
 
     <LinearLayout
             android:layout_height="wrap_content"

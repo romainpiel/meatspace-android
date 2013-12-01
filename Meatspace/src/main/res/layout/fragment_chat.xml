@@ -25,14 +25,22 @@
             android:layout_width="match_parent"
             android:orientation="horizontal"
             android:descendantFocusability="beforeDescendants"
-            android:focusableInTouchMode="true">
+            android:focusableInTouchMode="true"
+            style="@style/Meatspace.Container.Horizontal">
         <!-- descendantFocusability and focusableInTouchMode are here to disable autofocus -->
 
-        <com.romainpiel.lib.ui.view.CameraPreview
-                android:id="@+id/fragment_chat_camera_preview"
-                android:layout_height="100dp"
-                android:layout_width="100dp"
-                android:layout_marginLeft="@dimen/horizontal_padding"/>
+        <FrameLayout
+                android:layout_height="@dimen/gif_height"
+                android:layout_width="@dimen/gif_width"
+                android:layout_marginStart="1.5dp"> <!-- nine patch left offset to keep gifs aligned -->
+
+            <com.romainpiel.lib.ui.view.CameraPreview
+                    android:id="@+id/fragment_chat_camera_preview"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_gravity="center"/>
+
+        </FrameLayout>
 
         <EditText
                 android:id="@+id/fragment_chat_input"

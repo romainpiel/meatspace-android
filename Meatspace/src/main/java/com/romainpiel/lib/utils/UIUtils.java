@@ -26,13 +26,4 @@ public class UIUtils {
         }
         return result;
     }
-
-    public static void scrollToBottom(final ListView listView, final Adapter adapter) {
-        listView.post(new Runnable() {
-            @Override
-            public void run() {
-                listView.setSelection(adapter.getCount() - 1);
-            }
-        });
-    }
 }

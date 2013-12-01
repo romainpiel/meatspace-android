@@ -8,4 +8,7 @@
 
     <dimen name="translucent_ab_wind_padding_top">55dp</dimen>
 
+    <dimen name="gif_width">120dp</dimen>
+    <dimen name="gif_height">90dp</dimen>
+
 </resources>
