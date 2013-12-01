@@ -10,15 +10,12 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
 
-/**
- * This class assumes the parent layout is LinearLayout.LayoutParams.
- */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
     private Context context;
@@ -260,7 +257,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             }
         }
 
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.getLayoutParams();
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) this.getLayoutParams();
 
         int layoutHeight = (int) (tmpLayoutHeight * fact);
         int layoutWidth = (int) (tmpLayoutWidth * fact);
