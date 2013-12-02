@@ -11,11 +11,11 @@ import android.widget.TextView;
 import com.romainpiel.lib.gif.GIFUtils;
 import com.romainpiel.lib.ui.helper.InflateHelper;
 import com.romainpiel.lib.ui.listener.OnViewChangedListener;
+import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.model.Chat;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Date;
 
 import butterknife.InjectView;
@@ -72,19 +72,12 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
 
             Chat.Value value = chat.getValue();
 
-//            try {
-//                gif.setImage(GIFUtils.mediaToGIFbytes(value.getMedia()));
-//            } catch (IllegalArgumentException e) {
-//                // the gif could not be decoded
-//                Debug.out(e);
-//            }
-
             try {
                 ByteArrayInputStream in = new ByteArrayInputStream(GIFUtils.mediaToGIFbytes(value.getMedia()));
                 GifDrawable gifFromStream = new GifDrawable(in);
                 gif.setImageDrawable(gifFromStream);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                Debug.out(e);
             }
 
             Date date = new Date(value.getCreated());
