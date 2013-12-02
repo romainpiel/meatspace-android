@@ -29,9 +29,9 @@ import com.romainpiel.model.ChatList;
 import com.romainpiel.model.Device;
 import com.squareup.otto.Subscribe;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import butterknife.Views;
 
 /**
  * Meatspace
@@ -63,7 +63,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, null);
-        Views.inject(this, view);
+        ButterKnife.inject(this, view);
 
         previewHelper = new PreviewHelper(uiHandler);
         previewHelper.setOnCaptureListener(this);

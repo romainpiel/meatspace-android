@@ -18,8 +18,8 @@ import com.romainpiel.model.Chat;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.Views;
 import pl.droidsonroids.gif.GifDrawable;
 
 /**
@@ -88,7 +88,7 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
 
     @Override
     public void onViewChanged() {
-        Views.inject(this);
+        ButterKnife.inject(this);
     }
 
     @Override
