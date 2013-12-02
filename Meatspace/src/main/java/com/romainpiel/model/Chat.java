@@ -44,6 +44,8 @@ public class Chat implements Comparable<Chat> {
         private String media;
         private int ttl;
         private long created;
+        private boolean isMuted;
+        private boolean isFromMe;
 
         public String getFingerprint() {
             return fingerprint;
@@ -83,6 +85,22 @@ public class Chat implements Comparable<Chat> {
 
         public void setCreated(long created) {
             this.created = created;
+        }
+
+        public boolean isMuted() {
+            return isMuted;
+        }
+
+        public void setMuted(boolean isMuted) {
+            this.isMuted = isMuted;
+        }
+
+        public boolean isFromMe() {
+            return isFromMe;
+        }
+
+        public void setFromMe(boolean isFromMe) {
+            this.isFromMe = isFromMe;
         }
     }
 }
