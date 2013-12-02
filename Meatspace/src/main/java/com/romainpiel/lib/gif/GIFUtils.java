@@ -27,7 +27,11 @@ public class GIFUtils {
     }
 
     public static byte[] mediaToGIFbytes(String media) {
-        String gifData = media.replace(GIF_PREFIX, "");
-        return Base64.decode(gifData, Base64.DEFAULT);
+        try {
+            String gifData = media.replace(GIF_PREFIX, "");
+            return Base64.decode(gifData, Base64.DEFAULT);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }
