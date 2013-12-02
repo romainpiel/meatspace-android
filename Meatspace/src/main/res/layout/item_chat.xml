@@ -9,7 +9,8 @@
 
     <LinearLayout
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
             style="@style/Meatspace.Container">
         <TextView
@@ -26,5 +27,13 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_marginTop="5dp"/>
     </LinearLayout>
+
+    <ImageButton
+            android:id="@+id/item_chat_menu_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:scaleType="fitXY"
+            android:src="@drawable/card_menu_button"
+            android:background="@android:color/transparent"/>
 
 </merge>

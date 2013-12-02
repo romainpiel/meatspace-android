@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.romainpiel.lib.ui.listener.OnMenuClickListener;
 import com.romainpiel.lib.ui.view.ChatItemView;
 import com.romainpiel.model.Chat;
 
@@ -22,6 +23,7 @@ public class ChatAdapter extends BaseAdapter {
 
     private Context context;
     private List<Chat> items;
+    private OnMenuClickListener<Chat> onMuteClickListener;
 
     public ChatAdapter(Context context) {
         this.context = context;
@@ -31,8 +33,20 @@ public class ChatAdapter extends BaseAdapter {
     public void setItems(Collection<Chat> items) {
         this.items.clear();
         if (items != null) {
-            this.items.addAll(items);
+            for (Chat item : items) {
+                if (!item.getValue().isMuted()) {
+                    this.items.add(item);
+                }
+            }
         }
+    }
+
+    public OnMenuClickListener<Chat> getOnMuteClickListener() {
+        return onMuteClickListener;
+    }
+
+    public void setOnMuteClickListener(OnMenuClickListener<Chat> onMuteClickListener) {
+        this.onMuteClickListener = onMuteClickListener;
     }
 
     @Override
@@ -55,11 +69,13 @@ public class ChatAdapter extends BaseAdapter {
         ChatItemView itemView;
         if (convertView == null) {
             itemView = ChatItemView.build(context);
+            itemView.setOnMuteClickListener(onMuteClickListener);
         } else {
             itemView = (ChatItemView) convertView;
         }
 
         itemView.bind(getItem(position));
+
         return itemView;
     }
 }

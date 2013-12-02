@@ -37,4 +37,8 @@ public class ChatBus {
     public void post(ChatRequest chatRequest) {
         bus.post(chatRequest);
     }
+
+    public void post(MuteEvent muteEvent) {
+        bus.post(muteEvent);
+    }
 }

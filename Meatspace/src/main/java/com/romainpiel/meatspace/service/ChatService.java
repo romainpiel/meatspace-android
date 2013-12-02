@@ -22,6 +22,7 @@ import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.api.IOState;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.ChatEvent;
+import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.R;
@@ -29,6 +30,7 @@ import com.romainpiel.meatspace.activity.MainActivity;
 import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
 import com.romainpiel.model.ChatRequest;
+import com.romainpiel.model.Device;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
@@ -37,7 +39,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Meatspace
@@ -55,6 +60,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     private SocketIOClient socketIOClient;
     private Handler handler;
     private ChatList chatList;
+    private Set<String> mutedUsers;
     private IOState ioState;
 
     public static void start(Context context) {
@@ -71,6 +77,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
 
         ioState = IOState.IDLE;
         chatList = new ChatList();
+        mutedUsers = new HashSet<String>();
 
         busManager.getChatBus().register(this);
 
@@ -194,7 +201,9 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                post(new ChatList(result));
+                                ChatList newChats = new ChatList(result);
+                                syncChatList(newChats);
+                                post(newChats);
                             }
                         });
 
@@ -215,6 +224,36 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
             socketIOClient.emitRaw(4, jsonParser.toJson(chatRequest), null);
         } else {
             postError();
+        }
+    }
+
+    @Subscribe
+    public void onEvent(MuteEvent muteEvent) {
+        if (muteEvent.isMuted()) {
+            if (muteEvent.getFingerprint() != null) {
+                mutedUsers.add(muteEvent.getFingerprint());
+            }
+        } else if (muteEvent.getFingerprint() != null) {
+            mutedUsers.remove(muteEvent.getFingerprint());
+        } else if (muteEvent.getFingerprint() == null) {
+            mutedUsers.clear();
+        }
+        syncChatList(chatList);
+        post();
+    }
+
+    private void syncChatList(ChatList chatList) {
+
+        String myFingerprint = new Device(this).getId();
+
+        Collection<Chat> list = chatList.get();
+        Chat.Value chatValue;
+        String fingerprint;
+        for (Chat chat : list) {
+            chatValue = chat.getValue();
+            fingerprint = chatValue.getFingerprint();
+            chatValue.setMuted(mutedUsers.contains(fingerprint));
+            chatValue.setFromMe(fingerprint.equals(myFingerprint));
         }
     }
 

@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.romainpiel.lib.bus.BusManager;
+import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.meatspace.R;
@@ -39,6 +42,18 @@ public class MainActivity extends FragmentActivity {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        EasyTracker.getInstance(this).activityStart(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EasyTracker.getInstance(this).activityStop(this);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
@@ -48,6 +63,9 @@ public class MainActivity extends FragmentActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
         switch (item.getItemId()) {
+            case R.id.menu_main_unmute_all:
+                BusManager.get().getChatBus().post(new MuteEvent(false, null));
+                break;
             case R.id.menu_main_about:
                 showAboutDialog();
                 break;

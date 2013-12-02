@@ -19,19 +19,22 @@ import android.widget.ListView;
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.ChatEvent;
+import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
+import com.romainpiel.lib.ui.listener.OnMenuClickListener;
 import com.romainpiel.lib.ui.view.CameraPreview;
 import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.meatspace.service.ChatService;
+import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
 import com.romainpiel.model.Device;
 import com.squareup.otto.Subscribe;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import butterknife.Views;
 
 /**
  * Meatspace
@@ -63,7 +66,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, null);
-        Views.inject(this, view);
+        ButterKnife.inject(this, view);
 
         previewHelper = new PreviewHelper(uiHandler);
         previewHelper.setOnCaptureListener(this);
@@ -83,6 +86,12 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         if (adapter == null) {
             adapter = new ChatAdapter(getActivity());
+            adapter.setOnMuteClickListener(new OnMenuClickListener<Chat>() {
+                @Override
+                public void onMenuClick(Chat item) {
+                    BusManager.get().getChatBus().post(new MuteEvent(true, item.getValue().getFingerprint()));
+                }
+            });
         }
 
         if (device == null) {
