@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.meatspace.R;
@@ -36,6 +37,18 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         ChatService.start(this);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EasyTracker.getInstance(this).activityStart(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EasyTracker.getInstance(this).activityStop(this);
     }
 
     @Override

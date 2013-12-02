@@ -16,6 +16,7 @@
     <application
             android:allowBackup="true"
             android:label="@string/app_name"
+            android:name=".MeatspaceApplication"
             android:icon="@drawable/ic_launcher"
             android:theme="@style/Meatspace">
 
