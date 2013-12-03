@@ -3,6 +3,7 @@ package com.romainpiel.meatspace.activity;
 import android.app.AlertDialog;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
@@ -17,6 +18,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.MuteEvent;
+import com.romainpiel.lib.ui.fragment.ChatFragment;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.meatspace.R;
@@ -56,6 +58,10 @@ public class MainActivity extends FragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem item = menu.findItem(R.id.menu_main_switch_camera);
+        if (item != null) {
+            item.setVisible(Camera.getNumberOfCameras() > 1);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -63,6 +69,10 @@ public class MainActivity extends FragmentActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
         switch (item.getItemId()) {
+            case R.id.menu_main_switch_camera:
+                ChatFragment fragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.main_fragment);
+                fragment.switchCamera();
+                break;
             case R.id.menu_main_unmute_all:
                 BusManager.get().getChatBus().post(new MuteEvent(false, null));
                 break;

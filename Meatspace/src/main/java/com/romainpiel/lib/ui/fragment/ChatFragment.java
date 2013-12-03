@@ -213,6 +213,11 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         sendBtn.setEnabled(true);
     }
 
+    public void switchCamera() {
+        previewHelper.cancelCapture();
+        cameraPreview.switchCamera();
+    }
+
     private void showProgressDialog() {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(getActivity());

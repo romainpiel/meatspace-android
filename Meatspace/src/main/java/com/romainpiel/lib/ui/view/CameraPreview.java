@@ -13,6 +13,8 @@ import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.romainpiel.lib.ui.helper.PreferencesHelper;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -32,8 +34,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private int angle;
     private boolean surfaceConfiguring = false;
     private boolean previewIsRunning;
+    private int cameraId = -1;
     private PreviewReadyCallback previewReadyCallback = null;
     private PreviewCallback previewCallback;
+    private PreferencesHelper preferencesHelper;
 
     public CameraPreview(Context context) {
         super(context);
@@ -55,10 +59,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         layoutMode = mode;
         holder = getHolder();
         holder.addCallback(this);
+
+        preferencesHelper = new PreferencesHelper(context);
+        cameraId = preferencesHelper.getCameraId(findFrontFacingCamera());
     }
 
     private int findFrontFacingCamera() {
-        int cameraId = -1;
         // Search for the front facing camera
         int numberOfCameras = Camera.getNumberOfCameras();
         for (int i = 0; i < numberOfCameras; i++) {
@@ -72,15 +78,23 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return cameraId;
     }
 
+    public void switchCamera() {
+        cameraId = cameraId == -1 ? findFrontFacingCamera() : -1;
+        surfaceDestroyed(holder);
+        surfaceCreated(holder);
+        surfaceChanged(holder, 0, getWidth(), getHeight());
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
 
-        int cameraId = findFrontFacingCamera();
         if (cameraId < 0) {
             camera = Camera.open();
         } else {
             camera = Camera.open(cameraId);
         }
+
+        preferencesHelper.saveCameraId(cameraId);
 
         Camera.Parameters cameraParams = camera.getParameters();
         previewSizeList = cameraParams.getSupportedPreviewSizes();

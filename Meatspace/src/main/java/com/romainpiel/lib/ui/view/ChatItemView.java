@@ -80,8 +80,10 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
                 ByteArrayInputStream in = new ByteArrayInputStream(GIFUtils.mediaToGIFbytes(value.getMedia()));
                 GifDrawable gifFromStream = new GifDrawable(in);
                 gif.setImageDrawable(gifFromStream);
+                gif.setVisibility(VISIBLE);
             } catch (Exception e) {
                 Debug.out(e);
+                gif.setVisibility(INVISIBLE);
             }
 
             Date date = new Date(value.getCreated());
