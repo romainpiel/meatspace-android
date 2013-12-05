@@ -350,6 +350,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return angle;
     }
 
+    public boolean isFrontCamera() {
+        return cameraId != -1;
+    }
+
     public boolean isPortrait() {
         return (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
     }

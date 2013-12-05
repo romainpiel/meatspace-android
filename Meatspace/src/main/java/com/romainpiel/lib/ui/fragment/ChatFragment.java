@@ -112,6 +112,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Override
     public void onPreviewReady() {
         previewHelper.setAngle(cameraPreview.getAngle());
+        previewHelper.setFrontCamera(cameraPreview.isFrontCamera());
     }
 
     @Override
