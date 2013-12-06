@@ -23,6 +23,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
     private Handler uiHandler;
     private int angle;
+    private boolean isFrontCamera;
     private long lastTick;
     private int delay;
     private boolean capturing;
@@ -67,6 +68,10 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
     public void setAngle(int angle) {
         this.angle = angle;
+    }
+
+    public void setFrontCamera(boolean isFrontCamera) {
+        this.isFrontCamera = isFrontCamera;
     }
 
     public void setOnCaptureListener(OnCaptureListener onCaptureListener) {
@@ -123,7 +128,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
             float scaleFactor = realSized? Constants.CAPTURE_WIDTH / image.getWidth() : Constants.CAPTURE_WIDTH / image.getHeight();
 
             Matrix matrix = new Matrix();
-            matrix.postRotate(-angle);
+            matrix.postRotate(isFrontCamera? - angle : angle);
             matrix.postScale(scaleFactor, scaleFactor);
 
             int startX = realSized? 0 : Math.max(0, (image.getWidth() - image.getHeight()) / 2);
