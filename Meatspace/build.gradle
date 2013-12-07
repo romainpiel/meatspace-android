@@ -49,22 +49,19 @@ android {
 
     buildTypes {
         debug {
-            buildConfig "public final static boolean IS_DEBUG = true;",
-                    "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_debug;",
+            buildConfig "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_debug;",
                     "public final static int MEATSPACE_KEY = com.romainpiel.meatspace.R.string.key_api_debug;"
         }
         staging.initWith(buildTypes.debug)
         staging {
-            buildConfig "public final static boolean IS_DEBUG = true;",
-                    "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_staging;",
+            buildConfig "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_staging;",
                     "public final static int MEATSPACE_KEY = com.romainpiel.meatspace.R.string.key_api_staging;"
             debuggable false
             zipAlign true
         }
         release.initWith(buildTypes.staging)
         release {
-            buildConfig "public final static boolean IS_DEBUG = false;",
-                    "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_release;",
+            buildConfig "public final static int MEATSPACE_BASE_URL = com.romainpiel.meatspace.R.string.url_api_release;",
                     "public final static int MEATSPACE_KEY = com.romainpiel.meatspace.R.string.key_api_release;"
             signingConfig signingConfigs.release
         }

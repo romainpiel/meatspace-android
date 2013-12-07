@@ -15,7 +15,6 @@ public class MeatspaceApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        GoogleAnalytics.getInstance(this).setDryRun(BuildConfig.IS_DEBUG);
+        GoogleAnalytics.getInstance(this).setDryRun(BuildConfig.DEBUG);
     }
 }

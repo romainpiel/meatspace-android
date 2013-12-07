@@ -31,14 +31,10 @@ import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
 import com.romainpiel.model.ChatRequest;
 import com.romainpiel.model.Device;
+import com.romainpiel.model.SocketChatEvent;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -137,7 +133,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                 ioState = IOState.CONNECTED;
 
                 socketIOClient = client;
-                socketIOClient.addListener(ApiManager.EVENT_MESSAGE, ChatService.this);
+                socketIOClient.addListener(ChatService.this);
 
                 showForeground();
 
@@ -173,46 +169,36 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     }
 
     @Override
-    public void onEvent(String event, final JSONArray argument, Acknowledge acknowledge) {
-        if (event.equals(ApiManager.EVENT_MESSAGE)) {
+    public void onEvent(final String dataString, Acknowledge acknowledge) {
 
-            final Gson jsonParser = apiManager.getJsonParser();
+        final Gson jsonParser = apiManager.getJsonParser();
 
-            BackgroundExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
+        BackgroundExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
 
-                        JSONObject object;
-                        JSONObject jsonChat;
-                        Chat chat;
-                        final List<Chat> result = new ArrayList<Chat>();
+                    final SocketChatEvent event = jsonParser.fromJson(dataString, SocketChatEvent.class);
+                    final String name = event.getName();
+                    final List<Chat> chats = event.getChats();
 
-                        for (int i = 0; i < argument.length(); i++) {
-                            object = argument.getJSONObject(i);
-                            jsonChat = (JSONObject) object.get("chat");
+                    if (!ApiManager.EVENT_MESSAGE.equals(name) || chats == null)
+                        return;
 
-                            // TODO try to use strings from the very beginning...
-                            chat = jsonParser.fromJson(jsonChat.toString(), Chat.class);
-
-                            result.add(chat);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            ChatList newChats = new ChatList(chats);
+                            syncChatList(newChats);
+                            post(newChats);
                         }
+                    });
 
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                ChatList newChats = new ChatList(result);
-                                syncChatList(newChats);
-                                post(newChats);
-                            }
-                        });
-
-                    } catch (JSONException e) {
-                        Debug.out(e);
-                    }
+                } catch (Exception e) {
+                    Debug.out(e);
                 }
-            });
-        }
+            }
+        });
     }
 
     @Subscribe

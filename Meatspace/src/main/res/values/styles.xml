@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="Meatspace" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="Meatspace" parent="android:Theme.Holo.Light">
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:actionBarStyle">@style/Meatspace.ActionBar.Translucent</item>
         <item name="android:actionBarSize">@dimen/ab_height</item>
@@ -15,7 +15,6 @@
 
     <style name="Meatspace.ActionBar.TitleTextStyle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textColor">@color/ms_ab_text</item>
-        <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
     <style name="Meatspace.Container">
