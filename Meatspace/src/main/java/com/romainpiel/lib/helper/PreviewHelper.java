@@ -25,6 +25,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
     private int angle;
     private boolean isFrontCamera;
     private long lastTick;
+    private long t;
     private boolean capturing;
     private AnimatedGifEncoder gifEncoder;
     private Runnable stopCaptureRunnable;
@@ -41,6 +42,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
                 gifEncoder.finish();
 
                 if (onCaptureListener != null) {
+                    onCaptureListener.onCaptureProgress(1f);
                     onCaptureListener.onCaptureComplete(gifStream.toByteArray());
                 }
 
@@ -77,12 +79,12 @@ public class PreviewHelper implements Camera.PreviewCallback {
     private void prepareForNextCapture() {
         this.capturing = false;
         this.lastTick = -1;
+        this.t = 0;
         this.gifStream = null;
     }
 
     public void capture() {
         if (!capturing) {
-
 
             gifStream = new ByteArrayOutputStream();
             gifEncoder.start(gifStream);
@@ -90,6 +92,8 @@ public class PreviewHelper implements Camera.PreviewCallback {
             uiHandler.postDelayed(stopCaptureRunnable, Constants.CAPTURE_DURATION);
 
             capturing = true;
+            lastTick = System.currentTimeMillis();
+            t = 0;
 
             if (onCaptureListener != null) {
                 onCaptureListener.onCaptureStarted();
@@ -102,6 +106,12 @@ public class PreviewHelper implements Camera.PreviewCallback {
         if (capturing) {
 
             long now = System.currentTimeMillis();
+
+            t += now - lastTick;
+
+            if (onCaptureListener != null) {
+                onCaptureListener.onCaptureProgress(((float) t) / Constants.CAPTURE_DURATION);
+            }
 
             Camera.Parameters parameters = camera.getParameters();
             Camera.Size size = parameters.getPreviewSize();
@@ -117,23 +127,20 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
             float ratio = Constants.CAPTURE_WIDTH / Constants.CAPTURE_HEIGHT;
 
-            float srcWidth = realSized? image.getWidth() : (float) image.getHeight() / ratio;
-            float srcHeight = realSized? (float) image.getWidth() / ratio : image.getHeight();
+            float srcWidth = realSized ? image.getWidth() : (float) image.getHeight() / ratio;
+            float srcHeight = realSized ? (float) image.getWidth() / ratio : image.getHeight();
 
-            float scaleFactor = realSized? Constants.CAPTURE_WIDTH / image.getWidth() : Constants.CAPTURE_WIDTH / image.getHeight();
+            float scaleFactor = realSized ? Constants.CAPTURE_WIDTH / image.getWidth() : Constants.CAPTURE_WIDTH / image.getHeight();
 
             Matrix matrix = new Matrix();
-            matrix.postRotate(isFrontCamera? - angle : angle);
+            matrix.postRotate(isFrontCamera ? -angle : angle);
             matrix.postScale(scaleFactor, scaleFactor);
 
-            int startX = realSized? 0 : Math.max(0, (image.getWidth() - image.getHeight()) / 2);
-            int startY = realSized? Math.max(0, (image.getHeight() - image.getWidth())) / 2 : 0;
+            int startX = realSized ? 0 : Math.max(0, (image.getWidth() - image.getHeight()) / 2);
+            int startY = realSized ? Math.max(0, (image.getHeight() - image.getWidth())) / 2 : 0;
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, startX, startY, (int) srcWidth, (int) srcHeight, matrix, true);
 
-            if (lastTick != -1) {
-                gifEncoder.setDelay((int) (now - lastTick));
-            }
-
+            gifEncoder.setDelay((int) (now - lastTick));
             gifEncoder.addFrame(rotatedBitmap);
 
             rotatedBitmap.recycle();
@@ -151,6 +158,8 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
     public interface OnCaptureListener {
         public void onCaptureStarted();
+
+        public void onCaptureProgress(float progress);
 
         public void onCaptureComplete(byte[] gifData);
     }

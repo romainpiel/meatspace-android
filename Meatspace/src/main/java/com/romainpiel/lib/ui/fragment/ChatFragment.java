@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.bus.BusManager;
@@ -50,6 +51,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
     @InjectView(R.id.fragment_chat_input) EditText input;
     @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
+    @InjectView(R.id.fragment_chat_progress_bar) ProgressBar progressBar;
 
     private ProgressDialog progressDialog;
     private AlertDialog errorDialog;
@@ -196,6 +198,13 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onCaptureStarted() {
         input.setEnabled(false);
         sendBtn.setEnabled(false);
+        progressBar.setProgress(0);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onCaptureProgress(float progress) {
+        progressBar.setProgress((int) (progress*100));
     }
 
     @Override
@@ -212,6 +221,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         input.setEnabled(true);
         sendBtn.setEnabled(true);
+        progressBar.setVisibility(View.GONE);
     }
 
     public void switchCamera() {

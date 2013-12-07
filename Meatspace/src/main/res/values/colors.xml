@@ -16,4 +16,6 @@
     <color name="ms_input_bg">#fff181ad</color>
     <color name="ms_input_text">#ffffffff</color>
     <color name="ms_input_hint">#99ffffff</color>
+    <color name="ms_progress_bar_disabled">@android:color/transparent</color>
+    <color name="ms_progress_bar_enabled">#fff181ad</color>
 </resources>
