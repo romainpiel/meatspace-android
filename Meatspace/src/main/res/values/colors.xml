@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ms_ab_bg">#99222222</color>
+    <color name="ms_ab_bg">#99ffffff</color>
     <color name="ms_ab_button">#00000000</color>
     <color name="ms_ab_button_pressed">#33f8bed5</color>
-    <color name="ms_ab_text">#ffffffff</color>
+    <color name="ms_ab_text">#ff787878</color>
     <color name="ms_button_bg_disabled">#00000000</color>
     <color name="ms_button_bg_pressed">#33f8bed5</color>
     <color name="ms_button_bg">#00000000</color>
@@ -13,4 +13,7 @@
     <color name="ms_notif_button_bg">#00000000</color>
     <color name="ms_item_timestamp">#ff929292</color>
     <color name="ms_item_message">#ff000000</color>
+    <color name="ms_input_bg">#fff181ad</color>
+    <color name="ms_input_text">#ffffffff</color>
+    <color name="ms_input_hint">#99ffffff</color>
 </resources>
