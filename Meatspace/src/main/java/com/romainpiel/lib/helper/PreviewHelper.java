@@ -25,7 +25,6 @@ public class PreviewHelper implements Camera.PreviewCallback {
     private int angle;
     private boolean isFrontCamera;
     private long lastTick;
-    private int delay;
     private boolean capturing;
     private AnimatedGifEncoder gifEncoder;
     private Runnable stopCaptureRunnable;
@@ -39,9 +38,6 @@ public class PreviewHelper implements Camera.PreviewCallback {
             @Override
             public void run() {
 
-                if (delay != -1) {
-                    gifEncoder.setDelay(delay);
-                }
                 gifEncoder.finish();
 
                 if (onCaptureListener != null) {
@@ -81,7 +77,6 @@ public class PreviewHelper implements Camera.PreviewCallback {
     private void prepareForNextCapture() {
         this.capturing = false;
         this.lastTick = -1;
-        this.delay = -1;
         this.gifStream = null;
     }
 
@@ -135,14 +130,14 @@ public class PreviewHelper implements Camera.PreviewCallback {
             int startY = realSized? Math.max(0, (image.getHeight() - image.getWidth())) / 2 : 0;
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, startX, startY, (int) srcWidth, (int) srcHeight, matrix, true);
 
+            if (lastTick != -1) {
+                gifEncoder.setDelay((int) (now - lastTick));
+            }
+
             gifEncoder.addFrame(rotatedBitmap);
 
             rotatedBitmap.recycle();
             bitmap.recycle();
-
-            if (lastTick != -1 && delay == -1) {
-                delay = (int) (now - lastTick);
-            }
 
             lastTick = now;
         }
