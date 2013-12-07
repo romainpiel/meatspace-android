@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.bus.BusManager;
@@ -52,6 +55,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @InjectView(R.id.fragment_chat_input) EditText input;
     @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
     @InjectView(R.id.fragment_chat_progress_bar) ProgressBar progressBar;
+    @InjectView(R.id.fragment_chat_char_count) TextView charCount;
 
     private ProgressDialog progressDialog;
     private AlertDialog errorDialog;
@@ -60,6 +64,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     private Handler uiHandler;
     private Device device;
     private Parcelable listViewState;
+    private int maxCharCount;
 
     public ChatFragment() {
         this.uiHandler = new Handler();
@@ -70,10 +75,29 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         View view = inflater.inflate(R.layout.fragment_chat, null);
         ButterKnife.inject(this, view);
 
+        maxCharCount = getResources().getInteger(R.integer.input_max_char_count);
+
         previewHelper = new PreviewHelper(uiHandler);
         previewHelper.setOnCaptureListener(this);
         cameraPreview.setPreviewCallback(previewHelper);
         cameraPreview.setOnPreviewReady(this);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                invalidateMaxCharCount();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        invalidateMaxCharCount();
 
         return view;
     }
@@ -157,6 +181,12 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
                         getString(R.string.chat_error_unreachable_message));
                 break;
         }
+    }
+
+    private void invalidateMaxCharCount() {
+        int maxCharLeft = maxCharCount - input.getText().length();
+        charCount.setText(String.valueOf(maxCharLeft));
+        sendBtn.setEnabled(maxCharLeft >= 0);
     }
 
     public void notifyDatasetChanged(final ChatList chatList) {

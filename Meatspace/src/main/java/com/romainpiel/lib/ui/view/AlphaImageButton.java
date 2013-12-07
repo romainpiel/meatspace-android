@@ -28,6 +28,6 @@ public class AlphaImageButton extends ImageButton {
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        ObjectAnimator.ofFloat(this, "alpha", enabled ? 1f : 0.5f).start();
+        ObjectAnimator.ofFloat(this, "alpha", enabled ? 1f : 0.3f).start();
     }
 }

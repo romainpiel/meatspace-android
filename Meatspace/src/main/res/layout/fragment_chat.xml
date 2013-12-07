@@ -67,13 +67,28 @@
                 android:hint="@string/input_hint"
                 style="@style/Meatspace.Container"/>
 
-        <com.romainpiel.lib.ui.view.AlphaImageButton
-                android:id="@+id/fragment_chat_send"
+        <FrameLayout
                 android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:src="@android:drawable/ic_menu_send"
-                android:background="@drawable/button_bg_ms"
-                style="@style/Meatspace.Container"/>
+                android:layout_width="wrap_content">
+
+            <com.romainpiel.lib.ui.view.AlphaImageButton
+                    android:id="@+id/fragment_chat_send"
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:src="@android:drawable/ic_menu_send"
+                    android:background="@drawable/button_bg_ms"
+                    style="@style/Meatspace.Container"/>
+
+            <TextView
+                    android:id="@+id/fragment_chat_char_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:gravity="center"
+                    android:textColor="@color/ms_input_text"
+                    android:paddingBottom="5dp"/>
+
+        </FrameLayout>
 
     </LinearLayout>
 
