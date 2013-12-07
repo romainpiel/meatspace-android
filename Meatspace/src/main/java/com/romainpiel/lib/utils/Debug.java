@@ -26,7 +26,7 @@ import java.util.Set;
  */
 public class Debug {
 
-    private static boolean DEBUG = BuildConfig.IS_DEBUG;
+    private static boolean DEBUG = BuildConfig.DEBUG;
 
     /**
      * Sets if the app is in debug mode.

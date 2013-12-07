@@ -35,7 +35,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!BuildConfig.IS_DEBUG) {
+        if (!BuildConfig.DEBUG) {
             BugSenseHandler.initAndStartSession(this, getString(R.string.key_bugsense));
         }
         setContentView(R.layout.activity_main);
