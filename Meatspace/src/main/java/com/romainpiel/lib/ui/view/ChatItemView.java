@@ -10,13 +10,10 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import com.bugsense.trace.BugSenseHandler;
-import com.romainpiel.lib.gif.GIFUtils;
 import com.romainpiel.lib.ui.helper.InflateHelper;
 import com.romainpiel.lib.ui.listener.OnMenuClickListener;
 import com.romainpiel.lib.ui.listener.OnViewChangedListener;
 import com.romainpiel.lib.utils.Debug;
-import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.model.Chat;
 
@@ -79,15 +76,12 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
             Chat.Value value = chat.getValue();
 
             try {
-                ByteArrayInputStream in = new ByteArrayInputStream(GIFUtils.mediaToGIFbytes(value.getMedia()));
+                ByteArrayInputStream in = new ByteArrayInputStream(value.getMedia().getBytes());
                 GifDrawable gifFromStream = new GifDrawable(in);
                 gif.setImageDrawable(gifFromStream);
                 gif.setVisibility(VISIBLE);
             } catch (Exception e) {
                 Debug.out(e);
-                if (!BuildConfig.DEBUG) {
-                    BugSenseHandler.sendExceptionMessage("gif", value.getMedia(), e);
-                }
                 gif.setVisibility(INVISIBLE);
             }
 

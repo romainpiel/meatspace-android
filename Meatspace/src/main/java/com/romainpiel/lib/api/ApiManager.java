@@ -3,13 +3,15 @@ package com.romainpiel.lib.api;
 import android.content.Context;
 import android.os.Handler;
 
+import com.bugsense.trace.BugSenseHandler;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.koushikdutta.async.http.socketio.ConnectCallback;
 import com.koushikdutta.async.http.socketio.SocketIOClient;
 import com.romainpiel.lib.bus.BusManager;
-import com.romainpiel.lib.gif.GIFUtils;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.model.ChatRequest;
+import com.romainpiel.model.GifMedia;
 
 /**
  * Meatspace
@@ -25,7 +27,8 @@ public class ApiManager {
 
     private Gson jsonParser;
 
-    private ApiManager() {}
+    private ApiManager() {
+    }
 
     public static ApiManager get() {
         if (instance == null) {
@@ -36,7 +39,9 @@ public class ApiManager {
 
     public Gson getJsonParser() {
         if (jsonParser == null) {
-            jsonParser = new Gson();
+            jsonParser = new GsonBuilder()
+                    .registerTypeAdapter(GifMedia.class, GifMedia.getDeserializer())
+                    .create();
         }
         return jsonParser;
     }
@@ -50,10 +55,20 @@ public class ApiManager {
     }
 
     public void emit(Context context, String text, byte[] picture, String fingerprint) {
+        String media = GifMedia.mediaFromGIFbytes(picture);
+
+        if (media == null) {
+            // malformed GIF
+            if (!BuildConfig.DEBUG) {
+                BugSenseHandler.sendEvent("null gif, bytes==null "+ (picture == null));
+            }
+            return;
+        }
+
         ChatRequest chatRequest = new ChatRequest(
                 context.getString(BuildConfig.MEATSPACE_KEY),
                 text,
-                GIFUtils.mediaFromGIFbytes(picture),
+                media,
                 fingerprint
         );
         BusManager.get().getChatBus().post(chatRequest);
