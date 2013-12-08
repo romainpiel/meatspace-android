@@ -254,11 +254,11 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     }
 
     public void post() {
-        this.busManager.getChatBus().post(new ChatEvent(ioState, chatList));
+        this.busManager.getChatBus().post(new ChatEvent(false, ioState, chatList));
     }
 
     @Produce
     public ChatEvent produce() {
-        return new ChatEvent(ioState, chatList);
+        return new ChatEvent(true, ioState, chatList);
     }
 }

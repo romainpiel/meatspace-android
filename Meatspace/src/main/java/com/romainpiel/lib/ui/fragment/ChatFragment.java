@@ -49,6 +49,8 @@ import butterknife.OnClick;
 public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureListener, CameraPreview.PreviewReadyCallback {
 
     private static final String STATE_LISTVIEW = "state_listview";
+    private static final String POSITION_LIST = "position_list";
+    private static final String POSITION_ITEM = "position_item";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
@@ -65,6 +67,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     private Device device;
     private Parcelable listViewState;
     private int maxCharCount;
+    private int listPosition, itemPosition;
 
     public ChatFragment() {
         this.uiHandler = new Handler();
@@ -108,6 +111,8 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         if (savedInstanceState != null) {
             listViewState = savedInstanceState.getParcelable(STATE_LISTVIEW);
+            listPosition = savedInstanceState.getInt(POSITION_LIST);
+            itemPosition = savedInstanceState.getInt(POSITION_ITEM);
         }
 
         if (adapter == null) {
@@ -131,8 +136,18 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        // Save list state
         Parcelable state = listView.onSaveInstanceState();
         outState.putParcelable(STATE_LISTVIEW, state);
+
+        // Save position of first visible item
+        listPosition = listView.getFirstVisiblePosition();
+        outState.putInt(POSITION_LIST, listPosition);
+
+        // Save scroll position of item
+        View itemView = listView.getChildAt(0);
+        itemPosition = itemView == null ? 0 : itemView.getTop();
+        outState.putInt(POSITION_ITEM, itemPosition);
     }
 
     @Override
@@ -158,7 +173,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     @Subscribe
     public void onMessage(ChatEvent event) {
-        notifyDatasetChanged(event.getChatList());
+        notifyDatasetChanged(event.getChatList(), event.isFromProducer());
 
         switch (event.getIoState()) {
             case IDLE:
@@ -189,30 +204,21 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         sendBtn.setEnabled(maxCharLeft >= 0);
     }
 
-    public void notifyDatasetChanged(final ChatList chatList) {
-
-        notifyDatasetChanged(new Runnable() {
-            @Override
-            public void run() {
-                adapter.setItems(chatList.get());
-            }
-        });
-    }
-
-    public void notifyDatasetChanged(final Runnable runBefore) {
+    public void notifyDatasetChanged(final ChatList chatList, final boolean forceScrollToBottom) {
 
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
 
-                if (runBefore != null) {
-                    runBefore.run();
-                }
+                adapter.setItems(chatList.get());
                 adapter.notifyDataSetChanged();
 
                 if (listViewState != null) {
                     listView.onRestoreInstanceState(listViewState);
+                    listView.setSelectionFromTop(listPosition, itemPosition);
                     listViewState = null;
+                } else if (forceScrollToBottom) {
+                    UIUtils.scrollToBottom(listView, adapter);
                 }
             }
 
@@ -234,7 +240,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     @Override
     public void onCaptureProgress(float progress) {
-        progressBar.setProgress((int) (progress*100));
+        progressBar.setProgress((int) (progress * 100));
     }
 
     @Override
