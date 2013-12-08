@@ -73,6 +73,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
 
         ioState = IOState.IDLE;
         chatList = new ChatList();
+        chatList.setMaxSize(Constants.CHAT_MAX_SIZE);
         mutedUsers = new HashSet<String>();
 
         busManager.getChatBus().register(this);

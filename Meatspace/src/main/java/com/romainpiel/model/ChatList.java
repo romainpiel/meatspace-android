@@ -1,8 +1,9 @@
 package com.romainpiel.model;
 
+import com.romainpiel.lib.utils.BoundedTreeSet;
+
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.TreeSet;
 
 /**
  * Meatspace
@@ -42,11 +43,17 @@ public class ChatList {
         }
     }
 
+    public void setMaxSize(int maxSize) {
+        if (chats != null && chats.get() != null) {
+            chats.get().setMaxSize(maxSize);
+        }
+    }
+
     private static class Content {
-        private TreeSet<Chat> chats;
+        private BoundedTreeSet<Chat> chats;
 
         public Content() {
-            chats = new TreeSet<Chat>(new Comparator<Chat>() {
+            chats = new BoundedTreeSet<Chat>(new Comparator<Chat>() {
                 @Override
                 public int compare(Chat lhs, Chat rhs) {
                     return Chat.compare(lhs, rhs);
@@ -54,7 +61,7 @@ public class ChatList {
             });
         }
 
-        public Collection<Chat> get() {
+        public BoundedTreeSet<Chat> get() {
             return chats;
         }
 
