@@ -106,8 +106,9 @@ public class PreviewHelper implements Camera.PreviewCallback {
         if (capturing) {
 
             long now = System.currentTimeMillis();
+            float duration = now - lastTick;
 
-            t += now - lastTick;
+            t += duration;
 
             if (onCaptureListener != null) {
                 onCaptureListener.onCaptureProgress(((float) t) / Constants.CAPTURE_DURATION);
@@ -140,7 +141,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
             int startY = realSized ? Math.max(0, (image.getHeight() - image.getWidth())) / 2 : 0;
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, startX, startY, (int) srcWidth, (int) srcHeight, matrix, true);
 
-            gifEncoder.setDelay((int) (now - lastTick));
+            gifEncoder.setDelay((int) (duration / Constants.CAPTURE_ACCELERATION));
             gifEncoder.addFrame(rotatedBitmap);
 
             rotatedBitmap.recycle();
