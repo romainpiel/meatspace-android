@@ -41,7 +41,7 @@ public class Chat implements Comparable<Chat> {
     public static class Value {
         private String fingerprint;
         private String message;
-        private String media;
+        private GifMedia media;
         private int ttl;
         private long created;
         private boolean isMuted;
@@ -63,11 +63,11 @@ public class Chat implements Comparable<Chat> {
             this.message = message;
         }
 
-        public String getMedia() {
+        public GifMedia getMedia() {
             return media;
         }
 
-        public void setMedia(String media) {
+        public void setMedia(GifMedia media) {
             this.media = media;
         }
 
