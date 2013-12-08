@@ -40,7 +40,6 @@ public class ApiManager {
     public Gson getJsonParser() {
         if (jsonParser == null) {
             jsonParser = new GsonBuilder()
-                    .registerTypeAdapter(GifMedia.class, GifMedia.getSerializer())
                     .registerTypeAdapter(GifMedia.class, GifMedia.getDeserializer())
                     .create();
         }

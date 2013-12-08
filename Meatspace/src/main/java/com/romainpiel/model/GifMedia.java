@@ -6,9 +6,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.lib.utils.StringUtils;
 
@@ -35,22 +32,13 @@ public class GifMedia {
         return bytes;
     }
 
-    public static JsonSerializer<GifMedia> getSerializer() {
-        return new JsonSerializer<GifMedia>() {
-            @Override
-            public JsonElement serialize(GifMedia gifMedia, Type type, JsonSerializationContext jsonSerializationContext) {
-                return new JsonPrimitive(mediaFromGIFbytes(gifMedia.bytes));
-            }
-        };
-    }
-
     public static JsonDeserializer<GifMedia> getDeserializer() {
         return new JsonDeserializer<GifMedia>() {
             @Override
             public GifMedia deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
                 String raw = jsonElement.getAsString();
                 GifMedia result = new GifMedia();
-                result.bytes = mediaToGIFbytes(unescape(raw));
+                result.bytes = mediaToGIFbytes(raw);
                 return result;
             }
         };
@@ -76,7 +64,7 @@ public class GifMedia {
         }
 
         try {
-            return Base64.decode(media, Base64.DEFAULT);
+            return Base64.decode(unescape(media), Base64.DEFAULT);
         } catch (IllegalArgumentException e) {
             return null;
         }
