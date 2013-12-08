@@ -135,7 +135,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
             Matrix matrix = new Matrix();
             matrix.postRotate(isFrontCamera ? -angle : angle);
-            matrix.postScale(scaleFactor, scaleFactor);
+            matrix.postScale(isFrontCamera ? -scaleFactor : scaleFactor, scaleFactor);
 
             int startX = realSized ? 0 : Math.max(0, (image.getWidth() - image.getHeight()) / 2);
             int startY = realSized ? Math.max(0, (image.getHeight() - image.getWidth())) / 2 : 0;
