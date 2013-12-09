@@ -15,8 +15,6 @@ public class Constants {
     public static final float CAPTURE_HEIGHT = 101;
     public static final float CAPTURE_ACCELERATION = 1.5f;
 
-    public static final int CHAT_MAX_SIZE = 30;
-
     public static final String PREF_KEY_DEVICE_ID = "PREF_KEY_DEVICE_ID";
 
     public static final int NOTIFICICATION_ID_CHAT = 1000;
