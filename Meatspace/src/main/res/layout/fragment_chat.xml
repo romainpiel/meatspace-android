@@ -21,7 +21,6 @@
             style="@style/Meatspace.Container"/>
 
     <LinearLayout
-            android:id="@+id/fragment_chat_input_container"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:orientation="horizontal"

@@ -54,7 +54,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     private static final String POSITION_ITEM = "position_item";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
-    @InjectView(R.id.fragment_chat_input_container) ViewGroup inputContainer;
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
     @InjectView(R.id.fragment_chat_input) EditText input;
     @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
