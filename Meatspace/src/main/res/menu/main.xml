@@ -11,6 +11,10 @@
             android:title="@string/menu_main_unmute_all"
             android:showAsAction="never"/>
     <item
+            android:id="@+id/menu_main_settings"
+            android:title="@string/menu_main_settings"
+            android:showAsAction="never"/>
+    <item
             android:id="@+id/menu_main_about"
             android:title="@string/menu_main_about"
             android:showAsAction="never"/>
