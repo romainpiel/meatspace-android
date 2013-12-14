@@ -155,6 +155,22 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     }
 
     @Override
+    public void onPreviewFailed() {
+        ChatService.stop(getActivity());
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.camera_cant_open_title)
+                .setMessage(R.string.camera_cant_open_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.camera_cant_open_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        getActivity().finish();
+                    }
+                })
+                .show();
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         cameraPreview.stopPreview();

@@ -15,6 +15,9 @@
     <string name="chat_error_app_closed_message">You got disconnected from the chat!</string>
     <string name="chat_error_connect">Connect</string>
     <string name="chat_error_leave">Leave</string>
+    <string name="camera_cant_open_title">Something\'s wrong…</string>
+    <string name="camera_cant_open_message">We couldn\'t open the camera preview. Please make sure it is not used from another app.</string>
+    <string name="camera_cant_open_ok">Close app</string>
     <string name="settings_title">Settings</string>
     <string name="settings_run_in_bg_title">Run in background</string>
     <string name="dialog_about_version" formatted="false">Version: %s - %d</string>

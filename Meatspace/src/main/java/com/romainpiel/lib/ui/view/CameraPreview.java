@@ -11,11 +11,9 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.romainpiel.lib.helper.PreferencesHelper;
 
-import java.io.IOException;
 import java.util.List;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
@@ -88,29 +86,37 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
 
-        if (cameraId < 0) {
-            camera = Camera.open();
-        } else {
-            camera = Camera.open(cameraId);
-        }
-
-        preferencesHelper.saveCameraId(cameraId);
-
-        Camera.Parameters cameraParams = camera.getParameters();
-        previewSizeList = cameraParams.getSupportedPreviewSizes();
-        pictureSizeList = cameraParams.getSupportedPictureSizes();
-
         try {
+
+            if (cameraId < 0) {
+                camera = Camera.open();
+            } else {
+                camera = Camera.open(cameraId);
+            }
+
+            preferencesHelper.saveCameraId(cameraId);
+
+            Camera.Parameters cameraParams = camera.getParameters();
+            previewSizeList = cameraParams.getSupportedPreviewSizes();
+            pictureSizeList = cameraParams.getSupportedPictureSizes();
+
             camera.setPreviewDisplay(this.holder);
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             stop();
+
+            if (previewReadyCallback != null) {
+                previewReadyCallback.onPreviewFailed();
+            }
         }
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         surfaceChangedCallDepth++;
-        doSurfaceChanged(width, height);
+        if (camera != null) {
+            doSurfaceChanged(width, height);
+        }
         surfaceChangedCallDepth--;
     }
 
@@ -156,12 +162,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             // Reconfigure
             if (previewSizeList.size() > 0) { // prevent infinite loop
                 surfaceChanged(null, 0, width, height);
-            } else {
-                Toast.makeText(context, "Can't start preview", Toast.LENGTH_LONG).show();
+            } else if (previewReadyCallback != null) {
+                previewReadyCallback.onPreviewFailed();
             }
         }
 
-        if (null != previewReadyCallback) {
+        if (previewReadyCallback != null) {
             previewReadyCallback.onPreviewReady();
         }
 
@@ -381,5 +387,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public interface PreviewReadyCallback {
         public void onPreviewReady();
+        public void onPreviewFailed();
     }
 }
