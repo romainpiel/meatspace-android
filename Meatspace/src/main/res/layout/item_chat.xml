@@ -7,15 +7,27 @@
             android:layout_height="@dimen/gif_height"
             android:layout_width="@dimen/gif_width"/>
 
-    <TextView
-            android:id="@+id/item_chat_message"
+    <LinearLayout
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textColor="@color/ms_item_message"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_marginTop="5dp"
-            android:autoLink="all"
-            style="@style/Meatspace.Container"/>
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            style="@style/Meatspace.Container">
+        <TextView
+                android:id="@+id/item_chat_timestamp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textColor="@color/ms_item_timestamp"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
+        <TextView
+                android:id="@+id/item_chat_message"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textColor="@color/ms_item_message"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="5dp"
+                android:autoLink="all"/>
+    </LinearLayout>
 
     <ImageButton
             android:id="@+id/item_chat_menu_button"
