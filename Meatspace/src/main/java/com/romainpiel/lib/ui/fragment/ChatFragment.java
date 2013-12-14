@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.bus.BusManager;
@@ -53,6 +54,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     private static final String POSITION_ITEM = "position_item";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
+    @InjectView(R.id.fragment_chat_input_container) ViewGroup inputContainer;
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
     @InjectView(R.id.fragment_chat_input) EditText input;
     @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
@@ -248,10 +250,8 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     @Override
     public void onCaptureStarted() {
-        input.setEnabled(false);
-        sendBtn.setEnabled(false);
         progressBar.setProgress(0);
-        progressBar.setVisibility(View.VISIBLE);
+        setInputEnabled(false);
     }
 
     @Override
@@ -270,10 +270,19 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         );
 
         input.setText(null);
+        setInputEnabled(true);
+    }
 
-        input.setEnabled(true);
-        sendBtn.setEnabled(true);
-        progressBar.setVisibility(View.GONE);
+    @Override
+    public void onCaptureFailed() {
+        setInputEnabled(true);
+        Toast.makeText(getActivity(), R.string.chat_error_couldnotpostmessage, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setInputEnabled(boolean enabled) {
+        input.setEnabled(enabled);
+        sendBtn.setEnabled(enabled);
+        progressBar.setVisibility(enabled? View.GONE : View.VISIBLE);
     }
 
     public void switchCamera() {

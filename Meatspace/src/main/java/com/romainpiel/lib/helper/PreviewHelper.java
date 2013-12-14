@@ -39,11 +39,17 @@ public class PreviewHelper implements Camera.PreviewCallback {
             @Override
             public void run() {
 
+                int frameCount = gifEncoder.getFrameCount();
+
                 gifEncoder.finish();
 
                 if (onCaptureListener != null) {
-                    onCaptureListener.onCaptureProgress(1f);
-                    onCaptureListener.onCaptureComplete(gifStream.toByteArray());
+                    if (frameCount == 0) {
+                        onCaptureListener.onCaptureFailed();
+                    } else {
+                        onCaptureListener.onCaptureProgress(1f);
+                        onCaptureListener.onCaptureComplete(gifStream.toByteArray());
+                    }
                 }
 
                 prepareForNextCapture();
@@ -163,5 +169,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
         public void onCaptureProgress(float progress);
 
         public void onCaptureComplete(byte[] gifData);
+
+        public void onCaptureFailed();
     }
 }
