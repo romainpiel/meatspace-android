@@ -18,7 +18,6 @@ import com.romainpiel.meatspace.R;
 import com.romainpiel.model.Chat;
 
 import java.io.ByteArrayInputStream;
-import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -33,7 +32,6 @@ import pl.droidsonroids.gif.GifDrawable;
 public class ChatItemView extends LinearLayout implements OnViewChangedListener {
 
     @InjectView(R.id.item_chat_gif) ImageView gif;
-    @InjectView(R.id.item_chat_timestamp) TextView timestamp;
     @InjectView(R.id.item_chat_message) TextView message;
     @InjectView(R.id.item_chat_menu_button) ImageButton menuButton;
 
@@ -85,8 +83,6 @@ public class ChatItemView extends LinearLayout implements OnViewChangedListener 
                 gif.setVisibility(INVISIBLE);
             }
 
-            Date date = new Date(value.getCreated());
-            timestamp.setText(com.romainpiel.lib.utils.DateUtils.formatTime(getContext(), date));
             message.setText(value.getMessage());
 
             if (!chat.getValue().isFromMe()) {
