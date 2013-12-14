@@ -1,8 +1,11 @@
-package com.romainpiel.lib.ui.helper;
+package com.romainpiel.lib.helper;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import com.romainpiel.meatspace.R;
 
 /**
  * Meatspace
@@ -32,5 +35,17 @@ public class PreferencesHelper {
     public void saveCameraId(int cameraId) {
         prefsEditor.putInt(KEY_PREFS_CAMERA_ID, cameraId);
         prefsEditor.apply();
+    }
+
+    public static boolean isRunInBgEnabled(Context context) {
+        return getDefaultBoolean(
+                context,
+                context.getString(R.string.settings_run_in_bg_key),
+                context.getResources().getBoolean(R.bool.settings_run_in_bg_default));
+    }
+
+    public static boolean getDefaultBoolean(Context context, String key, boolean defValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(key, defValue);
     }
 }

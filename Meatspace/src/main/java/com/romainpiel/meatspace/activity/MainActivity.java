@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
@@ -18,7 +19,9 @@ import com.bugsense.trace.BugSenseHandler;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.MuteEvent;
+import com.romainpiel.lib.helper.PreferencesHelper;
 import com.romainpiel.lib.ui.fragment.ChatFragment;
+import com.romainpiel.lib.ui.fragment.SettingsFragment;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.meatspace.R;
@@ -39,20 +42,22 @@ public class MainActivity extends FragmentActivity {
             BugSenseHandler.initAndStartSession(this, getString(R.string.key_bugsense));
         }
         setContentView(R.layout.activity_main);
-
-        ChatService.start(this);
     }
 
     @Override
     public void onStart() {
         super.onStart();
         EasyTracker.getInstance(this).activityStart(this);
+        ChatService.start(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         EasyTracker.getInstance(this).activityStop(this);
+        if (!PreferencesHelper.isRunInBgEnabled(this)) {
+            ChatService.stop(this);
+        }
     }
 
     @Override
@@ -75,6 +80,9 @@ public class MainActivity extends FragmentActivity {
                 break;
             case R.id.menu_main_unmute_all:
                 BusManager.get().getChatBus().post(new MuteEvent(false, null));
+                break;
+            case R.id.menu_main_settings:
+                showSettings();
                 break;
             case R.id.menu_main_about:
                 showAboutDialog();
@@ -105,5 +113,10 @@ public class MainActivity extends FragmentActivity {
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
+    }
+
+    private void showSettings() {
+        FragmentManager fm = getSupportFragmentManager();
+        new SettingsFragment().show(fm, null);
     }
 }

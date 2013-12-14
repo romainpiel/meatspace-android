@@ -39,11 +39,17 @@ public class PreviewHelper implements Camera.PreviewCallback {
             @Override
             public void run() {
 
+                int frameCount = gifEncoder.getFrameCount();
+
                 gifEncoder.finish();
 
                 if (onCaptureListener != null) {
-                    onCaptureListener.onCaptureProgress(1f);
-                    onCaptureListener.onCaptureComplete(gifStream.toByteArray());
+                    if (frameCount == 0) {
+                        onCaptureListener.onCaptureFailed();
+                    } else {
+                        onCaptureListener.onCaptureProgress(1f);
+                        onCaptureListener.onCaptureComplete(gifStream.toByteArray());
+                    }
                 }
 
                 prepareForNextCapture();
@@ -106,8 +112,9 @@ public class PreviewHelper implements Camera.PreviewCallback {
         if (capturing) {
 
             long now = System.currentTimeMillis();
+            float duration = now - lastTick;
 
-            t += now - lastTick;
+            t += duration;
 
             if (onCaptureListener != null) {
                 onCaptureListener.onCaptureProgress(((float) t) / Constants.CAPTURE_DURATION);
@@ -134,13 +141,13 @@ public class PreviewHelper implements Camera.PreviewCallback {
 
             Matrix matrix = new Matrix();
             matrix.postRotate(isFrontCamera ? -angle : angle);
-            matrix.postScale(scaleFactor, scaleFactor);
+            matrix.postScale(isFrontCamera ? -scaleFactor : scaleFactor, scaleFactor);
 
             int startX = realSized ? 0 : Math.max(0, (image.getWidth() - image.getHeight()) / 2);
             int startY = realSized ? Math.max(0, (image.getHeight() - image.getWidth())) / 2 : 0;
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, startX, startY, (int) srcWidth, (int) srcHeight, matrix, true);
 
-            gifEncoder.setDelay((int) (now - lastTick));
+            gifEncoder.setDelay((int) (duration / Constants.CAPTURE_ACCELERATION));
             gifEncoder.addFrame(rotatedBitmap);
 
             rotatedBitmap.recycle();
@@ -162,5 +169,7 @@ public class PreviewHelper implements Camera.PreviewCallback {
         public void onCaptureProgress(float progress);
 
         public void onCaptureComplete(byte[] gifData);
+
+        public void onCaptureFailed();
     }
 }

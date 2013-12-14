@@ -30,9 +30,13 @@ public class AnimatedGifEncoder {
     protected int palSize = 7; // color table size (bits-1)
     protected int dispose = -1; // disposal code (-1 = use default)
     protected boolean closeStream = false; // close stream when finished
-    protected boolean firstFrame = true;
+    protected int frameCount = 0;
     protected boolean sizeSet = false; // if false, get size from first frame
     protected int sample = 10; // default sample interval for quantizer
+
+    public int getFrameCount() {
+        return frameCount;
+    }
 
     /**
      * Sets the delay time between each frame, or changes it for subsequent frames
@@ -107,7 +111,7 @@ public class AnimatedGifEncoder {
             image = im;
             getImagePixels(); // convert to correct format if necessary
             analyzePixels(); // build color table & map pixels
-            if (firstFrame) {
+            if (frameCount == 0) {
                 writeLSD(); // logical screen descriptior
                 writePalette(); // global color table
                 if (repeat >= 0) {
@@ -117,11 +121,11 @@ public class AnimatedGifEncoder {
             }
             writeGraphicCtrlExt(); // write graphic control extension
             writeImageDesc(); // image descriptor
-            if (!firstFrame) {
+            if (frameCount > 0) {
                 writePalette(); // local color table
             }
             writePixels(); // encode and write pixel data
-            firstFrame = false;
+            frameCount++;
         } catch (IOException e) {
             ok = false;
         }
@@ -156,7 +160,7 @@ public class AnimatedGifEncoder {
         indexedPixels = null;
         colorTab = null;
         closeStream = false;
-        firstFrame = true;
+        frameCount = 0;
 
         return ok;
     }
@@ -373,7 +377,7 @@ public class AnimatedGifEncoder {
         writeShort(width); // image size
         writeShort(height);
         // packed fields
-        if (firstFrame) {
+        if (frameCount == 0) {
             // no LCT - GCT is used for first (or only) frame
             out.write(0);
         } else {

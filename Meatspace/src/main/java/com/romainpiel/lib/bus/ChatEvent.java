@@ -11,27 +11,25 @@ import com.romainpiel.model.ChatList;
  */
 public class ChatEvent {
 
+    private boolean fromProducer;
     private IOState ioState;
     private ChatList chatList;
 
-    public ChatEvent(IOState ioState, ChatList chatList) {
+    public ChatEvent(boolean fromProducer, IOState ioState, ChatList chatList) {
+        this.fromProducer = fromProducer;
         this.ioState = ioState;
         this.chatList = chatList;
+    }
+
+    public boolean isFromProducer() {
+        return fromProducer;
     }
 
     public IOState getIoState() {
         return ioState;
     }
 
-    public void setIoState(IOState ioState) {
-        this.ioState = ioState;
-    }
-
     public ChatList getChatList() {
         return chatList;
-    }
-
-    public void setChatList(ChatList chatList) {
-        this.chatList = chatList;
     }
 }

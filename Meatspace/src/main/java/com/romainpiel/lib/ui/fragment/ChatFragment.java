@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.bus.BusManager;
@@ -49,6 +50,8 @@ import butterknife.OnClick;
 public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureListener, CameraPreview.PreviewReadyCallback {
 
     private static final String STATE_LISTVIEW = "state_listview";
+    private static final String POSITION_LIST = "position_list";
+    private static final String POSITION_ITEM = "position_item";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
     @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
@@ -65,6 +68,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     private Device device;
     private Parcelable listViewState;
     private int maxCharCount;
+    private int listPosition, itemPosition;
 
     public ChatFragment() {
         this.uiHandler = new Handler();
@@ -79,8 +83,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         previewHelper = new PreviewHelper(uiHandler);
         previewHelper.setOnCaptureListener(this);
-        cameraPreview.setPreviewCallback(previewHelper);
-        cameraPreview.setOnPreviewReady(this);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -108,6 +110,8 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         if (savedInstanceState != null) {
             listViewState = savedInstanceState.getParcelable(STATE_LISTVIEW);
+            listPosition = savedInstanceState.getInt(POSITION_LIST);
+            itemPosition = savedInstanceState.getInt(POSITION_ITEM);
         }
 
         if (adapter == null) {
@@ -131,14 +135,40 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        // Save list state
         Parcelable state = listView.onSaveInstanceState();
         outState.putParcelable(STATE_LISTVIEW, state);
+
+        // Save position of first visible item
+        listPosition = listView.getFirstVisiblePosition();
+        outState.putInt(POSITION_LIST, listPosition);
+
+        // Save scroll position of item
+        View itemView = listView.getChildAt(0);
+        itemPosition = itemView == null ? 0 : itemView.getTop();
+        outState.putInt(POSITION_ITEM, itemPosition);
     }
 
     @Override
     public void onPreviewReady() {
         previewHelper.setAngle(cameraPreview.getAngle());
         previewHelper.setFrontCamera(cameraPreview.isFrontCamera());
+    }
+
+    @Override
+    public void onPreviewFailed() {
+        ChatService.stop(getActivity());
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.camera_cant_open_title)
+                .setMessage(R.string.camera_cant_open_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.camera_cant_open_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        getActivity().finish();
+                    }
+                })
+                .show();
     }
 
     @Override
@@ -153,12 +183,14 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onResume() {
         super.onResume();
         cameraPreview.startPreview();
+        cameraPreview.setPreviewCallback(previewHelper);
+        cameraPreview.setOnPreviewReady(this);
         BusManager.get().getChatBus().register(this);
     }
 
     @Subscribe
     public void onMessage(ChatEvent event) {
-        notifyDatasetChanged(event.getChatList());
+        notifyDatasetChanged(event.getChatList(), event.isFromProducer());
 
         switch (event.getIoState()) {
             case IDLE:
@@ -189,30 +221,21 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         sendBtn.setEnabled(maxCharLeft >= 0);
     }
 
-    public void notifyDatasetChanged(final ChatList chatList) {
-
-        notifyDatasetChanged(new Runnable() {
-            @Override
-            public void run() {
-                adapter.setItems(chatList.get());
-            }
-        });
-    }
-
-    public void notifyDatasetChanged(final Runnable runBefore) {
+    public void notifyDatasetChanged(final ChatList chatList, final boolean forceScrollToBottom) {
 
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
 
-                if (runBefore != null) {
-                    runBefore.run();
-                }
+                adapter.setItems(chatList.get());
                 adapter.notifyDataSetChanged();
 
                 if (listViewState != null) {
                     listView.onRestoreInstanceState(listViewState);
+                    listView.setSelectionFromTop(listPosition, itemPosition);
                     listViewState = null;
+                } else if (forceScrollToBottom) {
+                    UIUtils.scrollToBottom(listView, adapter);
                 }
             }
 
@@ -226,15 +249,13 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     @Override
     public void onCaptureStarted() {
-        input.setEnabled(false);
-        sendBtn.setEnabled(false);
         progressBar.setProgress(0);
-        progressBar.setVisibility(View.VISIBLE);
+        setInputEnabled(false);
     }
 
     @Override
     public void onCaptureProgress(float progress) {
-        progressBar.setProgress((int) (progress*100));
+        progressBar.setProgress((int) (progress * 100));
     }
 
     @Override
@@ -248,10 +269,19 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         );
 
         input.setText(null);
+        setInputEnabled(true);
+    }
 
-        input.setEnabled(true);
-        sendBtn.setEnabled(true);
-        progressBar.setVisibility(View.GONE);
+    @Override
+    public void onCaptureFailed() {
+        setInputEnabled(true);
+        Toast.makeText(getActivity(), R.string.chat_error_couldnotpostmessage, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setInputEnabled(boolean enabled) {
+        input.setEnabled(enabled);
+        sendBtn.setEnabled(enabled);
+        progressBar.setVisibility(enabled? View.GONE : View.VISIBLE);
     }
 
     public void switchCamera() {

@@ -63,6 +63,10 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         context.startService(new Intent(context, ChatService.class));
     }
 
+    public static void stop(Context context) {
+        context.stopService(new Intent(context, ChatService.class));
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -254,11 +258,11 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     }
 
     public void post() {
-        this.busManager.getChatBus().post(new ChatEvent(ioState, chatList));
+        this.busManager.getChatBus().post(new ChatEvent(false, ioState, chatList));
     }
 
     @Produce
     public ChatEvent produce() {
-        return new ChatEvent(ioState, chatList);
+        return new ChatEvent(true, ioState, chatList);
     }
 }
