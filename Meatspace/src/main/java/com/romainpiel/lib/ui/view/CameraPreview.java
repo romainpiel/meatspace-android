@@ -13,7 +13,7 @@ import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.romainpiel.lib.ui.helper.PreferencesHelper;
+import com.romainpiel.lib.helper.PreferencesHelper;
 
 import java.io.IOException;
 import java.util.List;

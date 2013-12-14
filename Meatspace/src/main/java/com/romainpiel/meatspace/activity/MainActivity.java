@@ -19,7 +19,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.MuteEvent;
-import com.romainpiel.lib.helper.PreferenceHelper;
+import com.romainpiel.lib.helper.PreferencesHelper;
 import com.romainpiel.lib.ui.fragment.ChatFragment;
 import com.romainpiel.lib.ui.fragment.SettingsFragment;
 import com.romainpiel.lib.utils.Debug;
@@ -55,7 +55,7 @@ public class MainActivity extends FragmentActivity {
     public void onStop() {
         super.onStop();
         EasyTracker.getInstance(this).activityStop(this);
-        if (!PreferenceHelper.isRunInBgEnabled(this)) {
+        if (!PreferencesHelper.isRunInBgEnabled(this)) {
             ChatService.stop(this);
         }
     }
