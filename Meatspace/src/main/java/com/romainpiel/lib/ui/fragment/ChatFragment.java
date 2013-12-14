@@ -82,8 +82,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         previewHelper = new PreviewHelper(uiHandler);
         previewHelper.setOnCaptureListener(this);
-        cameraPreview.setPreviewCallback(previewHelper);
-        cameraPreview.setOnPreviewReady(this);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -168,6 +166,8 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onResume() {
         super.onResume();
         cameraPreview.startPreview();
+        cameraPreview.setPreviewCallback(previewHelper);
+        cameraPreview.setOnPreviewReady(this);
         BusManager.get().getChatBus().register(this);
     }
 
