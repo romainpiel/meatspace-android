@@ -19,6 +19,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.MuteEvent;
+import com.romainpiel.lib.helper.PreferenceHelper;
 import com.romainpiel.lib.ui.fragment.ChatFragment;
 import com.romainpiel.lib.ui.fragment.SettingsFragment;
 import com.romainpiel.lib.utils.Debug;
@@ -41,20 +42,22 @@ public class MainActivity extends FragmentActivity {
             BugSenseHandler.initAndStartSession(this, getString(R.string.key_bugsense));
         }
         setContentView(R.layout.activity_main);
-
-        ChatService.start(this);
     }
 
     @Override
     public void onStart() {
         super.onStart();
         EasyTracker.getInstance(this).activityStart(this);
+        ChatService.start(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         EasyTracker.getInstance(this).activityStop(this);
+        if (!PreferenceHelper.isRunInBgEnabled(this)) {
+            ChatService.stop(this);
+        }
     }
 
     @Override
