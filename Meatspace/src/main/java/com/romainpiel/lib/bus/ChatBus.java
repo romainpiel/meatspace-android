@@ -11,7 +11,7 @@ import com.squareup.otto.ThreadEnforcer;
  * Time: 09:04
  *
  * Wrapper around a Bus associated to a Provider
- * Registering to a SessionBus instance will automatically fire an event
+ * Registering to a ChatBus instance will automatically fire an event
  */
 public class ChatBus {
 

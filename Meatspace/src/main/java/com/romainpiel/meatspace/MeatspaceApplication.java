@@ -15,6 +15,8 @@ public class MeatspaceApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // disable google analytics if in debug mode
         GoogleAnalytics.getInstance(this).setDryRun(BuildConfig.DEBUG);
     }
 }

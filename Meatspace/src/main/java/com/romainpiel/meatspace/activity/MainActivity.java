@@ -93,6 +93,9 @@ public class MainActivity extends FragmentActivity {
         return super.onMenuItemSelected(featureId, item);
     }
 
+    /**
+     * show about dialog
+     */
     private void showAboutDialog() {
         ViewGroup view = (ViewGroup) View.inflate(this, R.layout.dialog_about, null);
 
@@ -115,6 +118,9 @@ public class MainActivity extends FragmentActivity {
                 .show();
     }
 
+    /**
+     * show settings dialog
+     */
     private void showSettings() {
         FragmentManager fm = getSupportFragmentManager();
         new SettingsFragment().show(fm, null);

@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
  * User: romainpiel
  * Date: 08/12/2013
  * Time: 09:13
+ *
+ * model for a gif media. provide methods to serialize/deserialize properly gif data
  */
 public class GifMedia {
 
@@ -32,6 +34,9 @@ public class GifMedia {
         return bytes;
     }
 
+    /**
+     * @return a JsonDeserializer for GifMedia model
+     */
     public static JsonDeserializer<GifMedia> getDeserializer() {
         return new JsonDeserializer<GifMedia>() {
             @Override
@@ -44,6 +49,12 @@ public class GifMedia {
         };
     }
 
+    /**
+     * convert byte raw data to unescaped gif string data
+     *
+     * @param bytes source bytes
+     * @return converted data
+     */
     public static String mediaFromGIFbytes(byte[] bytes) {
         if (bytes == null) {
             return null;
@@ -58,6 +69,12 @@ public class GifMedia {
         return result;
     }
 
+    /**
+     * convert unescaped gif string data to byte raw data
+     *
+     * @param media source string
+     * @return converted data
+     */
     public static byte[] mediaToGIFbytes(String media) {
         if (media == null) {
             return null;
@@ -70,6 +87,15 @@ public class GifMedia {
         }
     }
 
+    /**
+     * correct malformed data by:
+     * - removing the gif prefix "data:image/gif;base64,"
+     * - replacing "%2b" by "+"
+     * - replacing "%2f" by "/"
+     *
+     * @param template string source
+     * @return unescaped string
+     */
     public static String unescape(String template) {
         Map<String,String> tokens = new HashMap<String,String>();
         tokens.put(GIF_PREFIX, "");

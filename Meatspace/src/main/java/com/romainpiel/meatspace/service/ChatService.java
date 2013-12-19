@@ -123,6 +123,12 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         return null;
     }
 
+    /**
+     * Socket connection callback
+     *
+     * @param ex potential exception if error
+     * @param client socket client
+     */
     @Override
     public void onConnectCompleted(final Exception ex, final SocketIOClient client) {
 
@@ -146,6 +152,9 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         });
     }
 
+    /**
+     * place service in foreground
+     */
     private void showForeground() {
 
         Intent openIntent = new Intent(this, MainActivity.class);
@@ -172,6 +181,12 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         startForeground(Constants.NOTIFICICATION_ID_CHAT, notification);
     }
 
+    /**
+     * Socket event callback
+     *
+     * @param dataString raw data of the message
+     * @param acknowledge socket channel details
+     */
     @Override
     public void onEvent(final String dataString, Acknowledge acknowledge) {
 
@@ -194,7 +209,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                         public void run() {
                             ChatList newChats = new ChatList(chats);
                             syncChatList(newChats);
-                            post(newChats);
+                            saveAndPost(newChats);
                         }
                     });
 
@@ -205,6 +220,11 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         });
     }
 
+    /**
+     * a new chat request to post was posted
+     *
+     * @param chatRequest chat request to post
+     */
     @Subscribe
     public void onEvent(ChatRequest chatRequest) {
         if (socketIOClient != null && socketIOClient.isConnected()) {
@@ -217,6 +237,11 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         }
     }
 
+    /**
+     * a user mute was requested
+     *
+     * @param muteEvent associated mute event
+     */
     @Subscribe
     public void onEvent(MuteEvent muteEvent) {
         if (muteEvent.isMuted()) {
@@ -232,6 +257,13 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         post();
     }
 
+    /**
+     * synchronize the chat list:
+     * - with the muted users list
+     * - init isFromMe variable
+     *
+     * @param chatList chat list to sync
+     */
     private void syncChatList(ChatList chatList) {
 
         String myFingerprint = new Device(this).getId();
@@ -247,16 +279,27 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         }
     }
 
+    /**
+     * set current ioState to ERROR then post an event on the event bus
+     */
     public void postError() {
         ioState = IOState.ERROR;
         post();
     }
 
-    public void post(ChatList items) {
+    /**
+     * add items to current chat list and post an event to the event bus
+     *
+     * @param items items to add
+     */
+    public void saveAndPost(ChatList items) {
         this.chatList.addAll(items.get());
         post();
     }
 
+    /**
+     * post an event to the event bus
+     */
     public void post() {
         this.busManager.getChatBus().post(new ChatEvent(false, ioState, chatList));
     }

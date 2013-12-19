@@ -10,6 +10,8 @@ import android.widget.ImageButton;
  * User: romainpiel
  * Date: 17/11/2013
  * Time: 17:04
+ *
+ * image button fading when being enabled/disabled
  */
 public class AlphaImageButton extends ImageButton {
 

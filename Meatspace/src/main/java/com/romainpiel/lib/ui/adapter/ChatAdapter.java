@@ -18,6 +18,8 @@ import java.util.List;
  * User: romainpiel
  * Date: 01/11/2013
  * Time: 18:11
+ *
+ * adapter for a chat view group
  */
 public class ChatAdapter extends BaseAdapter {
 
