@@ -56,6 +56,5 @@ Thanks to the creators/contributors of all of these open-source libraries:
 - [android-websockets](https://github.com/koush/android-websockets)
 - [butterknife](https://github.com/JakeWharton/butterknife)
 - [google-gson](https://code.google.com/p/google-gson)
-- [retrofit](https://github.com/square/retrofit)
 - [otto](https://github.com/square/otto)
 - [android-gif-drawable](https://github.com/koral--/android-gif-drawable)
