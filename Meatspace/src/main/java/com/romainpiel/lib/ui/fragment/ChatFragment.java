@@ -174,17 +174,30 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Override
     public void onPause() {
         super.onPause();
+
+        // stop camera preview
         cameraPreview.stopPreview();
-        BusManager.get().getChatBus().unregister(this);
+
+        // cancel capture
         previewHelper.cancelCapture();
+
+        // unregister to bus
+        BusManager.get().getChatBus().unregister(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        // setup camera
         cameraPreview.startPreview();
         cameraPreview.setPreviewCallback(previewHelper);
         cameraPreview.setOnPreviewReady(this);
+
+        // enable ui
+        setInputEnabled(true);
+
+        // register to bus
         BusManager.get().getChatBus().register(this);
     }
 
