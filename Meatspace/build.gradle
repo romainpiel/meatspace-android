@@ -32,6 +32,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
+        versionCode 11
+        versionName "1.0.10"
     }
 
     signingConfigs {
@@ -45,21 +47,25 @@ android {
 
     buildTypes {
         debug {
+            signingConfig signingConfigs.debug
             buildConfigField "int", "MEATSPACE_BASE_URL", "com.romainpiel.meatspace.R.string.url_api_debug"
             buildConfigField "int", "MEATSPACE_KEY", "com.romainpiel.meatspace.R.string.key_api_debug"
+            debuggable true
+            zipAlign false
         }
-        staging.initWith(buildTypes.debug)
         staging {
+            signingConfig signingConfigs.debug
             buildConfigField "int", "MEATSPACE_BASE_URL", "com.romainpiel.meatspace.R.string.url_api_staging"
             buildConfigField "int", "MEATSPACE_KEY", "com.romainpiel.meatspace.R.string.key_api_staging"
             debuggable false
             zipAlign true
         }
-        release.initWith(buildTypes.staging)
         release {
+            signingConfig signingConfigs.release
             buildConfigField "int", "MEATSPACE_BASE_URL", "com.romainpiel.meatspace.R.string.url_api_release"
             buildConfigField "int", "MEATSPACE_KEY", "com.romainpiel.meatspace.R.string.key_api_release"
-            signingConfig signingConfigs.release
+            debuggable false
+            zipAlign true
         }
     }
 }
