@@ -18,6 +18,8 @@ import java.io.ByteArrayOutputStream;
  * User: romainpiel
  * Date: 10/11/2013
  * Time: 17:03
+ *
+ * helper handling a camera capture
  */
 public class PreviewHelper implements Camera.PreviewCallback {
 

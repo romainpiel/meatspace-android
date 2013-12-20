@@ -23,6 +23,7 @@ import com.romainpiel.lib.api.IOState;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.bus.MuteEvent;
+import com.romainpiel.lib.bus.UIEvent;
 import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.R;
@@ -58,6 +59,8 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     private ChatList chatList;
     private Set<String> mutedUsers;
     private IOState ioState;
+    private boolean appInBackground;
+    private int missedMessageCount;
 
     public static void start(Context context) {
         context.startService(new Intent(context, ChatService.class));
@@ -80,6 +83,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         mutedUsers = new HashSet<String>();
 
         busManager.getChatBus().register(this);
+        busManager.getUiBus().register(this);
 
         closeChatReceiver = new BroadcastReceiver() {
             @Override
@@ -98,6 +102,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
             apiManager.disconnect(socketIOClient);
         }
         busManager.getChatBus().unregister(this);
+        busManager.getUiBus().unregister(this);
         unregisterReceiver(closeChatReceiver);
         BackgroundExecutor.cancelAll(API_GET_CHAT_REQ_ID, true);
         super.onDestroy();
@@ -123,6 +128,12 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         return null;
     }
 
+    /**
+     * Socket connection callback
+     *
+     * @param ex potential exception if error
+     * @param client socket client
+     */
     @Override
     public void onConnectCompleted(final Exception ex, final SocketIOClient client) {
 
@@ -146,6 +157,9 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         });
     }
 
+    /**
+     * place service in foreground or update its notification
+     */
     private void showForeground() {
 
         Intent openIntent = new Intent(this, MainActivity.class);
@@ -154,16 +168,25 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         PendingIntent pi =
                 PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        String description;
+        if (appInBackground && missedMessageCount > 0) {
+            description = getResources().getQuantityString(R.plurals.service_chat_running_description_missed_messages_, missedMessageCount, missedMessageCount);
+            String lastMessage = chatList.get().last().getValue().getMessage();
+            builder.setTicker(lastMessage);
+        } else {
+            description = getString(R.string.service_chat_running_description);
+        }
+
         RemoteViews notificationView = new RemoteViews(this.getPackageName(), R.layout.notification_template);
         notificationView.setTextViewText(R.id.notification_template_title, getString(R.string.service_chat_running));
-        notificationView.setTextViewText(R.id.notification_template_text2, getString(R.string.service_chat_running_description));
+        notificationView.setTextViewText(R.id.notification_template_text2, description);
         notificationView.setOnClickPendingIntent(R.id.notification_template_cancel,
                 PendingIntent.getBroadcast(this, 0, new Intent(Constants.FILTER_CHAT_CLOSE), 0));
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-
         Notification notification = builder.setContentIntent(pi)
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setSmallIcon(R.drawable.ic_stat_meatspace)
                 .setContent(notificationView)
                 .build();
 
@@ -172,6 +195,12 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         startForeground(Constants.NOTIFICICATION_ID_CHAT, notification);
     }
 
+    /**
+     * Socket event callback
+     *
+     * @param dataString raw data of the message
+     * @param acknowledge socket channel details
+     */
     @Override
     public void onEvent(final String dataString, Acknowledge acknowledge) {
 
@@ -194,7 +223,19 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                         public void run() {
                             ChatList newChats = new ChatList(chats);
                             syncChatList(newChats);
-                            post(newChats);
+                            saveAndPost(newChats);
+
+                            int newMissedMessageCount = 0;
+                            for (Chat chat : chats) {
+                                // don't count if it's from me
+                                if (!chat.getValue().isFromMe()) {
+                                    newMissedMessageCount++;
+                                }
+                            }
+                            if (appInBackground && newMissedMessageCount > 0) {
+                                missedMessageCount += newMissedMessageCount;
+                                showForeground();
+                            }
                         }
                     });
 
@@ -205,6 +246,11 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         });
     }
 
+    /**
+     * a new chat request to post was posted
+     *
+     * @param chatRequest chat request to post
+     */
     @Subscribe
     public void onEvent(ChatRequest chatRequest) {
         if (socketIOClient != null && socketIOClient.isConnected()) {
@@ -217,6 +263,11 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         }
     }
 
+    /**
+     * a user mute was requested
+     *
+     * @param muteEvent associated mute event
+     */
     @Subscribe
     public void onEvent(MuteEvent muteEvent) {
         if (muteEvent.isMuted()) {
@@ -232,6 +283,20 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         post();
     }
 
+    @Subscribe
+    public void onEvent(UIEvent uiEvent) {
+        missedMessageCount = 0;
+        appInBackground = uiEvent == UIEvent.BACKGROUND;
+        showForeground();
+    }
+
+    /**
+     * synchronize the chat list:
+     * - with the muted users list
+     * - init isFromMe variable
+     *
+     * @param chatList chat list to sync
+     */
     private void syncChatList(ChatList chatList) {
 
         String myFingerprint = new Device(this).getId();
@@ -247,16 +312,27 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         }
     }
 
+    /**
+     * set current ioState to ERROR then post an event on the event bus
+     */
     public void postError() {
         ioState = IOState.ERROR;
         post();
     }
 
-    public void post(ChatList items) {
+    /**
+     * add items to current chat list and post an event to the event bus
+     *
+     * @param items items to add
+     */
+    public void saveAndPost(ChatList items) {
         this.chatList.addAll(items.get());
         post();
     }
 
+    /**
+     * post an event to the event bus
+     */
     public void post() {
         this.busManager.getChatBus().post(new ChatEvent(false, ioState, chatList));
     }

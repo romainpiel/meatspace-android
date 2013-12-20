@@ -5,6 +5,8 @@ package com.romainpiel;
  * User: romainpiel
  * Date: 10/11/2013
  * Time: 18:17
+ *
+ * // TODO list these in res/values
  */
 public class Constants {
 

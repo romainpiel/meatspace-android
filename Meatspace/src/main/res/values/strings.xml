@@ -8,6 +8,10 @@
     <string name="input_hint">Send a public message</string>
     <string name="service_chat_running">Meatspace chat running</string>
     <string name="service_chat_running_description">Tap on the \'exit\' icon to close the process</string>
+    <plurals name="service_chat_running_description_missed_messages_">
+        <item quantity="one">One unread message</item>
+        <item quantity="other">%d unread messages</item>
+    </plurals>
     <string name="chat_loading">Loading chat…</string>
     <string name="chat_error_unreachable_title">Network error</string>
     <string name="chat_error_unreachable_message">Meatspace is unreachable, please try again later.</string>

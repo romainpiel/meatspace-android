@@ -8,6 +8,8 @@ import java.util.List;
  * User: romainpiel
  * Date: 07/12/2013
  * Time: 15:53
+ *
+ * model for a socket io event
  */
 public class SocketChatEvent {
 

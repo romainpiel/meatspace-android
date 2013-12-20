@@ -10,9 +10,11 @@ public class BusManager {
     private static BusManager instance;
 
     private ChatBus chatBus;
+    private UIBus uiBus;
 
     private BusManager() {
         chatBus = new ChatBus();
+        uiBus = new UIBus();
     }
 
     public static BusManager get() {
@@ -24,5 +26,9 @@ public class BusManager {
 
     public ChatBus getChatBus() {
         return chatBus;
+    }
+
+    public UIBus getUiBus() {
+        return uiBus;
     }
 }

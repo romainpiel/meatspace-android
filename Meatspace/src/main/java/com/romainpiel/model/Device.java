@@ -12,6 +12,8 @@ import java.util.UUID;
  * User: romainpiel
  * Date: 10/11/2013
  * Time: 18:15
+ *
+ * model for current device. typically used to retrieve the device id
  */
 public class Device {
 

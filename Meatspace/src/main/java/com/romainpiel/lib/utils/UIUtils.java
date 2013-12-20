@@ -27,6 +27,12 @@ public class UIUtils {
         return result;
     }
 
+    /**
+     * scroll to bottom a listview without animation
+     *
+     * @param listView listview to scroll
+     * @param adapter associated adapter
+     */
     public static void scrollToBottom(final ListView listView, final Adapter adapter) {
         listView.post(new Runnable() {
             @Override

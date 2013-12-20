@@ -26,11 +26,11 @@ public class ChatList {
         }
     }
 
-    public Collection<Chat> get() {
+    public TreeSet<Chat> get() {
         return chats != null? chats.get() : null;
     }
 
-    public void addAll(Collection<Chat> items) {
+    public void addAll(TreeSet<Chat> items) {
         if (chats != null && chats.get() != null) {
             chats.get().addAll(items);
         }
@@ -54,7 +54,7 @@ public class ChatList {
             });
         }
 
-        public Collection<Chat> get() {
+        public TreeSet<Chat> get() {
             return chats;
         }
 
