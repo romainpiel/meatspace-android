@@ -172,7 +172,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
         Notification notification = builder.setContentIntent(pi)
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setSmallIcon(R.drawable.ic_stat_meatspace)
                 .setContent(notificationView)
                 .build();
 
