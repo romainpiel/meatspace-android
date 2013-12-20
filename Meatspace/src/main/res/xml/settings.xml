@@ -5,4 +5,8 @@
             android:key="@string/settings_run_in_bg_key"
             android:title="@string/settings_run_in_bg_title"
             android:defaultValue="@bool/settings_run_in_bg_default"/>
+    <CheckBoxPreference
+            android:key="@string/settings_enable_notifications_key"
+            android:title="@string/settings_run_enable_notifications_title"
+            android:defaultValue="@bool/settings_enable_notifications"/>
 </PreferenceScreen>

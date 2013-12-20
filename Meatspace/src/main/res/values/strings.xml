@@ -25,6 +25,7 @@
     <string name="camera_cant_open_ok">Close app</string>
     <string name="settings_title">Settings</string>
     <string name="settings_run_in_bg_title">Run in background</string>
+    <string name="settings_run_enable_notifications_title">Enable notifications</string>
     <string name="dialog_about_version" formatted="false">Version: %s - %d</string>
     <string name="dialog_about_content"><![CDATA[
         <a href="https://chat.meatspac.es/">https://chat.meatspac.es/</a><br/>

@@ -24,6 +24,7 @@ import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.bus.UIEvent;
+import com.romainpiel.lib.helper.PreferencesHelper;
 import com.romainpiel.lib.utils.BackgroundExecutor;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.R;
@@ -131,7 +132,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     /**
      * Socket connection callback
      *
-     * @param ex potential exception if error
+     * @param ex     potential exception if error
      * @param client socket client
      */
     @Override
@@ -173,8 +174,10 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         String description;
         if (appInBackground && missedMessageCount > 0) {
             description = getResources().getQuantityString(R.plurals.service_chat_running_description_missed_messages_, missedMessageCount, missedMessageCount);
-            String lastMessage = chatList.get().last().getValue().getMessage();
-            builder.setTicker(lastMessage);
+            if (PreferencesHelper.areNotificationsEnabled(this)) {
+                String lastMessage = chatList.get().last().getValue().getMessage();
+                builder.setTicker(lastMessage);
+            }
         } else {
             description = getString(R.string.service_chat_running_description);
         }
@@ -198,7 +201,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     /**
      * Socket event callback
      *
-     * @param dataString raw data of the message
+     * @param dataString  raw data of the message
      * @param acknowledge socket channel details
      */
     @Override
