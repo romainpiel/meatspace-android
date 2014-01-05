@@ -123,8 +123,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private void doSurfaceChanged(int width, int height) {
         stopPreview();
 
-        camera.setPreviewCallback(previewCallback);
-
         Camera.Parameters cameraParams = camera.getParameters();
         boolean portrait = isPortrait();
 
@@ -176,6 +174,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void startPreview() {
         if (!previewIsRunning && (camera != null)) {
             camera.startPreview();
+            camera.setPreviewCallback(previewCallback);
             previewIsRunning = true;
         }
     }
@@ -183,6 +182,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void stopPreview() {
         if (previewIsRunning && (camera != null)) {
             camera.stopPreview();
+            camera.setPreviewCallback(null);
+            camera.release();
             previewIsRunning = false;
         }
     }
@@ -347,8 +348,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
 
         stopPreview();
-        camera.setPreviewCallback(null);
-        camera.release();
         camera = null;
     }
 
@@ -370,6 +369,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public void setPreviewCallback(PreviewCallback previewCallback) {
         this.previewCallback = previewCallback;
+        if (camera != null) {
+            camera.setPreviewCallback(previewCallback);
+        }
     }
 
     public Camera.Size getPreviewSize() {

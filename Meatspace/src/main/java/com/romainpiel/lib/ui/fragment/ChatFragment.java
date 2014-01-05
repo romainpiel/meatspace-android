@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -54,11 +55,12 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     private static final String POSITION_ITEM = "position_item";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
-    @InjectView(R.id.fragment_chat_camera_preview) CameraPreview cameraPreview;
+    @InjectView(R.id.fragment_chat_camera_preview_container) FrameLayout cameraPreviewContainer;
     @InjectView(R.id.fragment_chat_input) EditText input;
     @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
     @InjectView(R.id.fragment_chat_progress_bar) ProgressBar progressBar;
     @InjectView(R.id.fragment_chat_char_count) TextView charCount;
+    private CameraPreview cameraPreview;
 
     private ProgressDialog progressDialog;
     private AlertDialog errorDialog;
@@ -78,6 +80,8 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, null);
         ButterKnife.inject(this, view);
+
+        cameraPreview = new CameraPreview(getActivity());
 
         maxCharCount = getResources().getInteger(R.integer.input_max_char_count);
 
@@ -177,6 +181,8 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         // stop camera preview
         cameraPreview.stopPreview();
+        cameraPreviewContainer.removeView(cameraPreview);
+
 
         // cancel capture
         previewHelper.cancelCapture();
@@ -190,6 +196,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         super.onResume();
 
         // setup camera
+        cameraPreviewContainer.addView(cameraPreview, 0);
         cameraPreview.startPreview();
         cameraPreview.setPreviewCallback(previewHelper);
         cameraPreview.setOnPreviewReady(this);
