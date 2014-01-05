@@ -60,6 +60,7 @@
                 android:textCursorDrawable="@null"
                 android:background="@android:color/transparent"
                 android:hint="@string/input_hint"
+                android:inputType="textCapSentences"
                 style="@style/Meatspace.Container"/>
 
         <FrameLayout
