@@ -1,10 +1,10 @@
 package com.romainpiel.meatspace.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
@@ -31,7 +31,7 @@ import com.romainpiel.meatspace.service.ChatService;
  * Date: 01/11/2013
  * Time: 16:54
  */
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity  {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +75,7 @@ public class MainActivity extends FragmentActivity {
 
         switch (item.getItemId()) {
             case R.id.menu_main_switch_camera:
-                ChatFragment fragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.main_fragment);
+                ChatFragment fragment = (ChatFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
                 fragment.switchCamera();
                 break;
             case R.id.menu_main_unmute_all:
@@ -117,7 +117,7 @@ public class MainActivity extends FragmentActivity {
      * show settings dialog
      */
     private void showSettings() {
-        FragmentManager fm = getSupportFragmentManager();
+        FragmentManager fm = getFragmentManager();
         new SettingsFragment().show(fm, null);
     }
 }

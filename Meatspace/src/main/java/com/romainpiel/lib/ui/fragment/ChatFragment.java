@@ -1,13 +1,13 @@
 package com.romainpiel.lib.ui.fragment;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -105,8 +105,8 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     }
 
     @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null) {
             listViewState = savedInstanceState.getParcelable(STATE_LISTVIEW);
