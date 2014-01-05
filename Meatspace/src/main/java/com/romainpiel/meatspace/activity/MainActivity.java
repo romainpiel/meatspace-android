@@ -2,6 +2,7 @@ package com.romainpiel.meatspace.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -103,10 +104,12 @@ public class MainActivity extends Activity  {
         messageTv.setText(Html.fromHtml(getString(R.string.dialog_about_content)));
         messageTv.setMovementMethod(LinkMovementMethod.getInstance());
 
-        new AlertDialog.Builder(this)
+        Dialog dialog = new AlertDialog.Builder(this)
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, null)
-                .show();
+                .create();
+        dialog.getWindow().getAttributes().windowAnimations = R.style.Meatspace_Dialog_WindowAnimation;
+        dialog.show();
     }
 
     /**

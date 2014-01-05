@@ -23,6 +23,7 @@ public class SettingsFragment extends PreferenceDialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b) {
         getDialog().setTitle(getString(R.string.settings_title));
+        getDialog().getWindow().getAttributes().windowAnimations = R.style.Meatspace_Dialog_WindowAnimation;
         return super.onCreateView(inflater, container, b);
     }
 }
