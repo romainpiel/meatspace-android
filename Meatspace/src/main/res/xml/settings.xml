@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-            android:key="@string/settings_run_in_bg_key"
-            android:title="@string/settings_run_in_bg_title"
-            android:defaultValue="@bool/settings_run_in_bg_default"/>
+    <ListPreference
+            android:key="@string/settings_auto_kill_timeout_bg_key"
+            android:title="@string/settings_auto_kill_timeout_bg_title"
+            android:defaultValue="@string/settings_auto_kill_timeout_bg_default"
+            android:entries="@array/settings_auto_kill_timeout_bg_values_string"
+            android:entryValues="@array/settings_auto_kill_timeout_bg_values"
+            android:summary="%s"/>
     <CheckBoxPreference
             android:key="@string/settings_enable_notifications_key"
             android:title="@string/settings_run_enable_notifications_title"
-            android:defaultValue="@bool/settings_enable_notifications"/>
+            android:defaultValue="@bool/settings_enable_notifications_default"/>
 </PreferenceScreen>

@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_run_in_bg_key">settings_run_in_bg_key</string>
-    <bool name="settings_run_in_bg_default">true</bool>
+
+    <string name="settings_auto_kill_timeout_bg_title">Stop service when going to background</string>
+    <string name="settings_auto_kill_timeout_bg_key">settings_run_in_bg_key</string>
+    <string name="settings_auto_kill_timeout_bg_default">-1</string>
+    <string-array name="settings_auto_kill_timeout_bg_values_string">
+        <item>Never</item>
+        <item>Immediately</item>
+        <item>After 1 minute</item>
+        <item>After 5 minutes</item>
+        <item>After 10 minutes</item>
+    </string-array>
+    <string-array name="settings_auto_kill_timeout_bg_values">
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+    </string-array>
+
+    <string name="settings_run_enable_notifications_title">Enable notifications</string>
     <string name="settings_enable_notifications_key">settings_enable_notifications_key</string>
-    <bool name="settings_enable_notifications">true</bool>
+    <bool name="settings_enable_notifications_default">true</bool>
 </resources>

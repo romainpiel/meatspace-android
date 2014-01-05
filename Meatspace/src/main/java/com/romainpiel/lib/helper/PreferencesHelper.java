@@ -37,18 +37,23 @@ public class PreferencesHelper {
         prefsEditor.apply();
     }
 
-    public static boolean isRunInBgEnabled(Context context) {
-        return getDefaultBoolean(
+    public static int getAutoKillTimeoutBg(Context context) {
+        return Integer.valueOf(getDefaultString(
                 context,
-                context.getString(R.string.settings_run_in_bg_key),
-                context.getResources().getBoolean(R.bool.settings_run_in_bg_default));
+                context.getString(R.string.settings_auto_kill_timeout_bg_key),
+                context.getResources().getString(R.string.settings_auto_kill_timeout_bg_default)));
     }
 
     public static boolean areNotificationsEnabled(Context context) {
         return getDefaultBoolean(
                 context,
                 context.getString(R.string.settings_enable_notifications_key),
-                context.getResources().getBoolean(R.bool.settings_enable_notifications));
+                context.getResources().getBoolean(R.bool.settings_enable_notifications_default));
+    }
+
+    public static String getDefaultString(Context context, String key, String defValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(key, defValue);
     }
 
     public static boolean getDefaultBoolean(Context context, String key, boolean defValue) {

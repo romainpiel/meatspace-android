@@ -18,7 +18,6 @@ import com.google.analytics.tracking.android.EasyTracker;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.bus.UIEvent;
-import com.romainpiel.lib.helper.PreferencesHelper;
 import com.romainpiel.lib.ui.fragment.ChatFragment;
 import com.romainpiel.lib.ui.fragment.SettingsFragment;
 import com.romainpiel.meatspace.BuildConfig;
@@ -54,9 +53,6 @@ public class MainActivity extends Activity  {
     public void onStop() {
         super.onStop();
         EasyTracker.getInstance(this).activityStop(this);
-        if (!PreferencesHelper.isRunInBgEnabled(this)) {
-            ChatService.stop(this);
-        }
         BusManager.get().getUiBus().post(UIEvent.BACKGROUND);
     }
 

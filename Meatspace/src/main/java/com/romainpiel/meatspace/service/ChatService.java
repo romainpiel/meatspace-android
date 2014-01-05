@@ -62,6 +62,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     private IOState ioState;
     private boolean appInBackground;
     private int missedMessageCount;
+    private Runnable autoKillTimeoutBgRunnable;
 
     public static void start(Context context) {
         context.startService(new Intent(context, ChatService.class));
@@ -291,6 +292,22 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         missedMessageCount = 0;
         appInBackground = uiEvent == UIEvent.BACKGROUND;
         showForeground();
+
+        if (uiEvent == UIEvent.BACKGROUND) {
+            int autokillTimeout = PreferencesHelper.getAutoKillTimeoutBg(this);
+            if (autokillTimeout >= 0) {
+                autoKillTimeoutBgRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        stopSelf();
+                    }
+                };
+                handler.postDelayed(autoKillTimeoutBgRunnable, autokillTimeout * 60 * 1000);
+            }
+        } else if (autoKillTimeoutBgRunnable != null) {
+            handler.removeCallbacksAndMessages(autoKillTimeoutBgRunnable);
+            autoKillTimeoutBgRunnable = null;
+        }
     }
 
     /**
