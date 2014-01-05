@@ -306,6 +306,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
     public void switchCamera() {
         previewHelper.cancelCapture();
+        setInputEnabled(true);
         cameraPreview.switchCamera();
     }
 
