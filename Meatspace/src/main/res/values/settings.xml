@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="settings_auto_kill_timeout_bg_title">Stop service when going to background</string>
+    <string name="settings_auto_kill_timeout_bg_title">Stop service in background</string>
     <string name="settings_auto_kill_timeout_bg_key">settings_run_in_bg_key</string>
     <string name="settings_auto_kill_timeout_bg_default">-1</string>
     <string-array name="settings_auto_kill_timeout_bg_values_string">
