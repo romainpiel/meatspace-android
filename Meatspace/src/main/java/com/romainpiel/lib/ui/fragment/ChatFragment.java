@@ -81,8 +81,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         View view = inflater.inflate(R.layout.fragment_chat, null);
         ButterKnife.inject(this, view);
 
-        cameraPreview = new CameraPreview(getActivity());
-
         maxCharCount = getResources().getInteger(R.integer.input_max_char_count);
 
         previewHelper = new PreviewHelper(uiHandler);
@@ -196,6 +194,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         super.onResume();
 
         // setup camera
+        cameraPreview = new CameraPreview(getActivity());
         cameraPreviewContainer.addView(cameraPreview, 0);
         cameraPreview.startPreview();
         cameraPreview.setPreviewCallback(previewHelper);
