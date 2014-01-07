@@ -11,6 +11,7 @@ import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -179,8 +180,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
 
         // stop camera preview
         cameraPreview.stopPreview();
-        cameraPreviewContainer.removeView(cameraPreview);
-
+        removeCameraView();
 
         // cancel capture
         previewHelper.cancelCapture();
@@ -194,8 +194,7 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         super.onResume();
 
         // setup camera
-        cameraPreview = new CameraPreview(getActivity());
-        cameraPreviewContainer.addView(cameraPreview, 0);
+        addCameraView();
         cameraPreview.startPreview();
         cameraPreview.setPreviewCallback(previewHelper);
         cameraPreview.setOnPreviewReady(this);
@@ -232,6 +231,20 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
                         getString(R.string.chat_error_unreachable_message));
                 break;
         }
+    }
+
+    private void addCameraView() {
+        cameraPreview = new CameraPreview(getActivity());
+        cameraPreviewContainer.addView(cameraPreview, 0,
+                new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        Gravity.CENTER_VERTICAL));
+    }
+
+    private void removeCameraView() {
+        cameraPreviewContainer.removeView(cameraPreview);
+        cameraPreview = null;
     }
 
     private void invalidateMaxCharCount() {

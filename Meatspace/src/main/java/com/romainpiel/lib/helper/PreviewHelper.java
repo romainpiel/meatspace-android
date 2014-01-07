@@ -145,8 +145,8 @@ public class PreviewHelper implements Camera.PreviewCallback {
             matrix.postRotate(isFrontCamera ? -angle : angle);
             matrix.postScale(isFrontCamera ? -scaleFactor : scaleFactor, scaleFactor);
 
-            int startX = realSized ? 0 : Math.max(0, (image.getWidth() - image.getHeight()) / 2);
-            int startY = realSized ? Math.max(0, (image.getHeight() - image.getWidth())) / 2 : 0;
+            int startX = (int) (image.getWidth() - srcWidth)/2;
+            int startY = (int) (image.getHeight() - srcHeight)/2;
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, startX, startY, (int) srcWidth, (int) srcHeight, matrix, true);
 
             gifEncoder.setDelay((int) (duration / Constants.CAPTURE_ACCELERATION));
