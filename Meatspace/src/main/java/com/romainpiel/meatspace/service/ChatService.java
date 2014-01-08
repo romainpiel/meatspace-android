@@ -299,13 +299,15 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                 autoKillTimeoutBgRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        stopSelf();
+                        if (BusManager.get().getUiBus().getLastEvent() == UIEvent.BACKGROUND) {
+                            stopSelf();
+                        }
                     }
                 };
                 handler.postDelayed(autoKillTimeoutBgRunnable, autokillTimeout * 60 * 1000);
             }
         } else if (autoKillTimeoutBgRunnable != null) {
-            handler.removeCallbacksAndMessages(autoKillTimeoutBgRunnable);
+            handler.removeCallbacks(autoKillTimeoutBgRunnable);
             autoKillTimeoutBgRunnable = null;
         }
     }

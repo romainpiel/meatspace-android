@@ -12,6 +12,7 @@ import com.squareup.otto.ThreadEnforcer;
 public class UIBus {
 
     private Bus bus;
+    private UIEvent lastEvent;
 
     public UIBus() {
         // events will be fired on the main thread
@@ -20,6 +21,7 @@ public class UIBus {
 
     public void post(UIEvent uiEvent) {
         bus.post(uiEvent);
+        lastEvent = uiEvent;
     }
 
     public void register(Object object) {
@@ -28,5 +30,9 @@ public class UIBus {
 
     public void unregister(Object object) {
         bus.unregister(object);
+    }
+
+    public UIEvent getLastEvent() {
+        return lastEvent;
     }
 }
