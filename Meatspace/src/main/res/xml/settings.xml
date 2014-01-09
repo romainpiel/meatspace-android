@@ -2,6 +2,12 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
+            android:key="@string/settings_url_key"
+            android:title="@string/settings_url_title"
+            android:entries="@array/settings_url_values_string"
+            android:entryValues="@array/settings_url_values_string"
+            android:summary="%s"/>
+    <ListPreference
             android:key="@string/settings_auto_kill_timeout_bg_key"
             android:title="@string/settings_auto_kill_timeout_bg_title"
             android:defaultValue="@string/settings_auto_kill_timeout_bg_default"

@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.koushikdutta.async.http.socketio.ConnectCallback;
 import com.koushikdutta.async.http.socketio.SocketIOClient;
 import com.romainpiel.lib.bus.BusManager;
+import com.romainpiel.lib.helper.PreferencesHelper;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.model.ChatRequest;
 import com.romainpiel.model.GifMedia;
@@ -47,7 +48,8 @@ public class ApiManager {
     }
 
     public void connect(Context context, ConnectCallback callback) {
-        SocketIOClient.connect(context.getString(BuildConfig.MEATSPACE_BASE_URL), callback, new Handler());
+        SocketIOClient.connect(
+                PreferencesHelper.getBaseUrl(context), callback, new Handler());
     }
 
     public void disconnect(SocketIOClient client) {

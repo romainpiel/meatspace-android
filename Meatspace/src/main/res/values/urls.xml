@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="url_api_debug">http://192.168.1.103:3000</string> // set your computer IP here
+    <string name="url_api_debug">http://192.168.1.109:3000</string> // set your computer IP here
     <string name="url_api_staging">http://chat-staging.meatspac.es/</string>
-    <string name="url_api_release">https://chat.meatspac.es</string>
+    <string name="url_api_release">@string/url_api_release_english</string>
+
+    <string name="url_api_release_english">https://chat.meatspac.es</string>
+    <string name="url_api_release_french">http://fr.meatspac.es</string>
 </resources>

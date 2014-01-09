@@ -300,7 +300,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                     @Override
                     public void run() {
                         if (BusManager.get().getUiBus().getLastEvent() == UIEvent.BACKGROUND) {
-                            stopSelf();
+                            sendBroadcast(new Intent(Constants.FILTER_CHAT_CLOSE));
                         }
                     }
                 };

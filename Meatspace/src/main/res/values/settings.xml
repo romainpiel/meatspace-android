@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="settings_url_title">Meatspace channel</string>
+    <string name="settings_url_key">settings_url_key</string>
+    <string-array name="settings_url_values_string">
+        <item>@string/url_api_release_english</item>
+        <item>@string/url_api_release_french</item>
+    </string-array>
+
     <string name="settings_auto_kill_timeout_bg_title">Stop service in background</string>
     <string name="settings_auto_kill_timeout_bg_key">settings_auto_kill_timeout_bg_key</string>
     <string name="settings_auto_kill_timeout_bg_default">-1</string>
@@ -22,4 +29,5 @@
     <string name="settings_run_enable_notifications_title">Enable notifications</string>
     <string name="settings_enable_notifications_key">settings_enable_notifications_key</string>
     <bool name="settings_enable_notifications_default">true</bool>
+
 </resources>

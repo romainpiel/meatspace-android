@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.meatspace.R;
 
 /**
@@ -49,6 +50,13 @@ public class PreferencesHelper {
                 context,
                 context.getString(R.string.settings_enable_notifications_key),
                 context.getResources().getBoolean(R.bool.settings_enable_notifications_default));
+    }
+
+    public static String getBaseUrl(Context context) {
+        return getDefaultString(
+                context,
+                context.getString(R.string.settings_url_key),
+                context.getResources().getString(BuildConfig.MEATSPACE_BASE_URL));
     }
 
     public static String getDefaultString(Context context, String key, String defValue) {

@@ -2,6 +2,7 @@ package com.romainpiel.lib.ui.fragment;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -349,6 +350,13 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 ChatService.start(getActivity());
+                            }
+                        })
+                        .setNeutralButton(R.string.chat_error_settings, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                FragmentManager fm = getFragmentManager();
+                                new SettingsFragment().show(fm, null);
                             }
                         })
                         .setNegativeButton(R.string.chat_error_leave, new DialogInterface.OnClickListener() {
