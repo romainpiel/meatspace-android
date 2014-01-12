@@ -12,6 +12,8 @@ public class Constants {
 
     public static final String LOG_TAG = "MEATSPACE";
 
+    public static final String CACHE_MUTED_USERS = "muted_users";
+
     public static final int CAPTURE_DURATION = 2000;
     public static final float CAPTURE_WIDTH = 135;
     public static final float CAPTURE_HEIGHT = 101;

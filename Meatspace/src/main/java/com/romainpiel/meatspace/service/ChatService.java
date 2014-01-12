@@ -28,6 +28,7 @@ import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.bus.UIEvent;
 import com.romainpiel.lib.helper.PreferencesHelper;
 import com.romainpiel.lib.utils.BackgroundExecutor;
+import com.romainpiel.lib.utils.CacheManager;
 import com.romainpiel.lib.utils.Debug;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.meatspace.activity.MainActivity;
@@ -53,6 +54,8 @@ import java.util.Set;
 public class ChatService extends Service implements ConnectCallback, EventCallback, ErrorCallback, DisconnectCallback {
 
     private static final String API_GET_CHAT_REQ_ID = "ChatService.GET_CHAT";
+    private static final String API_CACHE_MUTED_REQ_ID = "ChatService.CACHE_MUTED";
+    private static final String API_GET_CACHED_MUTED_REQ_ID = "ChatService.GET_CACHED_MUTED";
 
     private ApiManager apiManager;
     private BusManager busManager;
@@ -60,11 +63,12 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     private SocketIOClient socketIOClient;
     private Handler handler;
     private ChatList chatList;
-    private Set<String> mutedUsers;
+    private HashSet<String> mutedUsers;
     private IOState ioState;
     private boolean appInBackground;
     private int missedMessageCount;
     private Runnable autoKillTimeoutBgRunnable;
+    private CacheManager cacheManager;
 
     public static void start(Context context) {
         context.startService(new Intent(context, ChatService.class));
@@ -78,6 +82,7 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     public void onCreate() {
         super.onCreate();
 
+        cacheManager = new CacheManager(this, false);
         apiManager = ApiManager.get();
         busManager = BusManager.get();
         handler = new Handler();
@@ -85,6 +90,26 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         ioState = IOState.IDLE;
         chatList = new ChatList();
         mutedUsers = new HashSet<String>();
+
+        BackgroundExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final HashSet<String> cachedMutedUsers = (HashSet<String>) cacheManager.readFile(Constants.CACHE_MUTED_USERS, null);
+
+                if (cachedMutedUsers != null) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mutedUsers = cachedMutedUsers;
+                            if (chatList.get() != null && !chatList.get().isEmpty()) {
+                                syncChatList(chatList);
+                                post();
+                            }
+                        }
+                    });
+                }
+            }
+        }, API_GET_CACHED_MUTED_REQ_ID, null);
 
         busManager.getChatBus().register(this);
         busManager.getUiBus().register(this);
@@ -109,6 +134,8 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         busManager.getUiBus().unregister(this);
         unregisterReceiver(closeChatReceiver);
         BackgroundExecutor.cancelAll(API_GET_CHAT_REQ_ID, true);
+        BackgroundExecutor.cancelAll(API_GET_CACHED_MUTED_REQ_ID, true);
+        BackgroundExecutor.cancelAll(API_CACHE_MUTED_REQ_ID, true);
         super.onDestroy();
     }
 
@@ -287,6 +314,14 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
         } else if (muteEvent.getFingerprint() == null) {
             mutedUsers.clear();
         }
+
+        BackgroundExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                cacheManager.writeFile(Constants.CACHE_MUTED_USERS, mutedUsers);
+            }
+        }, API_CACHE_MUTED_REQ_ID, null);
+
         syncChatList(chatList);
         post();
     }
