@@ -6,6 +6,7 @@
     <string-array name="settings_url_values_string">
         <item>@string/url_api_release_english</item>
         <item>@string/url_api_release_french</item>
+        <item>@string/url_api_release_spanish</item>
     </string-array>
 
     <string name="settings_auto_kill_timeout_bg_title">Stop service in background</string>

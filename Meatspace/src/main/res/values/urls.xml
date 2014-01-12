@@ -5,5 +5,6 @@
     <string name="url_api_release">@string/url_api_release_english</string>
 
     <string name="url_api_release_english">https://chat.meatspac.es</string>
-    <string name="url_api_release_french">http://fr.meatspac.es</string>
+    <string name="url_api_release_french">https://fr.meatspac.es</string>
+    <string name="url_api_release_spanish">https://es.meatspac.es</string>
 </resources>

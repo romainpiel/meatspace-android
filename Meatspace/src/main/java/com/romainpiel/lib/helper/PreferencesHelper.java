@@ -18,6 +18,7 @@ import com.romainpiel.meatspace.R;
  */
 public class PreferencesHelper {
 
+    private static final String KEY_PREFS_LAST_APP_VERSION = "last_app_version";
     private static final String KEY_PREFS_CAMERA_ID = "camera_id";
     private static final String APP_SHARED_PREFS = PreferencesHelper.class.getSimpleName();
 
@@ -36,6 +37,20 @@ public class PreferencesHelper {
     public void saveCameraId(int cameraId) {
         prefsEditor.putInt(KEY_PREFS_CAMERA_ID, cameraId);
         prefsEditor.apply();
+    }
+
+    public int getLastAppVersion(int defaultValue) {
+        return sharedPrefs.getInt(KEY_PREFS_LAST_APP_VERSION, defaultValue);
+    }
+
+    public void saveLastAppVersion(int lastAppVersion) {
+        prefsEditor.putInt(KEY_PREFS_LAST_APP_VERSION, lastAppVersion);
+        prefsEditor.apply();
+    }
+
+    public static void cleanDefault(Context context, int key) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().remove(context.getString(key)).apply();
     }
 
     public static int getAutoKillTimeoutBg(Context context) {
