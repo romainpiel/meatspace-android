@@ -15,6 +15,8 @@ import android.widget.RemoteViews;
 import com.google.gson.Gson;
 import com.koushikdutta.async.http.socketio.Acknowledge;
 import com.koushikdutta.async.http.socketio.ConnectCallback;
+import com.koushikdutta.async.http.socketio.DisconnectCallback;
+import com.koushikdutta.async.http.socketio.ErrorCallback;
 import com.koushikdutta.async.http.socketio.EventCallback;
 import com.koushikdutta.async.http.socketio.SocketIOClient;
 import com.romainpiel.Constants;
@@ -48,7 +50,7 @@ import java.util.Set;
  * Date: 03/11/2013
  * Time: 17:47
  */
-public class ChatService extends Service implements ConnectCallback, EventCallback {
+public class ChatService extends Service implements ConnectCallback, EventCallback, ErrorCallback, DisconnectCallback {
 
     private static final String API_GET_CHAT_REQ_ID = "ChatService.GET_CHAT";
 
@@ -150,6 +152,8 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
                 ioState = IOState.CONNECTED;
 
                 socketIOClient = client;
+                socketIOClient.setErrorCallback(ChatService.this);
+                socketIOClient.setDisconnectCallback(ChatService.this);
                 socketIOClient.addListener(ChatService.this);
 
                 showForeground();
@@ -362,5 +366,15 @@ public class ChatService extends Service implements ConnectCallback, EventCallba
     @Produce
     public ChatEvent produce() {
         return new ChatEvent(true, ioState, chatList);
+    }
+
+    @Override
+    public void onError(String error) {
+        postError();
+    }
+
+    @Override
+    public void onDisconnect(Exception e) {
+        sendBroadcast(new Intent(Constants.FILTER_CHAT_CLOSE));
     }
 }
