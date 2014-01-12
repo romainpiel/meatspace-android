@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Meatspace</string>
     <string name="menu_main_switch_camera">Switch camera</string>
+    <string name="menu_main_disconnect">Disconnect</string>
     <string name="menu_main_unmute_all">Unmute</string>
     <string name="menu_main_about">About</string>
     <string name="menu_main_settings">Settings</string>

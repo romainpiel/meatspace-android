@@ -2,20 +2,24 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-            android:id="@+id/menu_main_switch_camera"
-            android:title="@string/menu_main_switch_camera"
-            android:icon="@drawable/ic_action_switch_camera"
-            android:showAsAction="ifRoom"/>
+        android:id="@+id/menu_main_switch_camera"
+        android:title="@string/menu_main_switch_camera"
+        android:icon="@drawable/ic_action_switch_camera"
+        android:showAsAction="ifRoom" />
     <item
-            android:id="@+id/menu_main_unmute_all"
-            android:title="@string/menu_main_unmute_all"
-            android:showAsAction="never"/>
+        android:id="@+id/menu_main_disconnect"
+        android:title="@string/menu_main_disconnect"
+        android:showAsAction="never" />
     <item
-            android:id="@+id/menu_main_settings"
-            android:title="@string/menu_main_settings"
-            android:showAsAction="never"/>
+        android:id="@+id/menu_main_unmute_all"
+        android:title="@string/menu_main_unmute_all"
+        android:showAsAction="never" />
     <item
-            android:id="@+id/menu_main_about"
-            android:title="@string/menu_main_about"
-            android:showAsAction="never"/>
+        android:id="@+id/menu_main_settings"
+        android:title="@string/menu_main_settings"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/menu_main_about"
+        android:title="@string/menu_main_about"
+        android:showAsAction="never" />
 </menu>

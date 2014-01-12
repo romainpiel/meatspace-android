@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.text.Html;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.romainpiel.Constants;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.bus.UIEvent;
@@ -73,7 +75,12 @@ public class MainActivity extends Activity  {
         switch (item.getItemId()) {
             case R.id.menu_main_switch_camera:
                 ChatFragment fragment = (ChatFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
-                fragment.switchCamera();
+                if (fragment != null) {
+                    fragment.switchCamera();
+                }
+                break;
+            case R.id.menu_main_disconnect:
+                sendBroadcast(new Intent(Constants.FILTER_CHAT_CLOSE));
                 break;
             case R.id.menu_main_unmute_all:
                 BusManager.get().getChatBus().post(new MuteEvent(false, null));
