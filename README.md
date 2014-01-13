@@ -8,7 +8,7 @@ An android client for the great chatting space [https://chat.meatspac.es](https:
 
 Check out the sources and submodules:
 ```bash
-> git submodule update
+> git submodule init --update
 ```
 
 ### Run on your machine:
@@ -29,6 +29,8 @@ Create a file `keys.xml` located at `Meatspace/src/main/res/values/` and list th
     <string name="key_api_debug">blahblahblah</string>
     <string name="key_api_staging"></string>
     <string name="key_api_release"></string>
+
+    <string name="key_bugsense"></string>
 </resources>
 ```
 
