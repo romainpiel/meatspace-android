@@ -2,15 +2,11 @@ package com.romainpiel.lib.ui.fragment;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -64,8 +60,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @InjectView(R.id.fragment_chat_char_count) TextView charCount;
     private CameraPreview cameraPreview;
 
-    private ProgressDialog progressDialog;
-    private AlertDialog errorDialog;
     private ChatAdapter adapter;
     private PreviewHelper previewHelper;
     private Handler uiHandler;
@@ -210,28 +204,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Subscribe
     public void onMessage(ChatEvent event) {
         notifyDatasetChanged(event.getChatList(), event.isFromProducer());
-
-        switch (event.getIoState()) {
-            case IDLE:
-                showProgressDialog();
-                break;
-            case CONNECTING:
-                showProgressDialog();
-                break;
-            case CONNECTED:
-                dismissProgressDialog();
-                break;
-            case DISCONNECTED:
-                cancelProgressDialog(
-                        getString(R.string.chat_error_app_closed),
-                        getString(R.string.chat_error_app_closed_message));
-                break;
-            case ERROR:
-                cancelProgressDialog(
-                        getString(R.string.chat_error_unreachable_title),
-                        getString(R.string.chat_error_unreachable_message));
-                break;
-        }
     }
 
     private void addCameraView() {
@@ -321,68 +293,5 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
         previewHelper.cancelCapture();
         setInputEnabled(true);
         cameraPreview.switchCamera();
-    }
-
-    private void showProgressDialog() {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage(getString(R.string.chat_loading));
-            progressDialog.setCancelable(true);
-            progressDialog.setCanceledOnTouchOutside(false);
-            progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    cancelProgressDialog(null, null);
-                }
-            });
-        }
-        progressDialog.show();
-    }
-
-    private void cancelProgressDialog(String title, String message) {
-        dismissProgressDialog();
-        if (TextUtils.isEmpty(message)) {
-            forceFinish();
-        } else {
-            if (errorDialog == null) {
-                errorDialog = new AlertDialog.Builder(getActivity())
-                        .setPositiveButton(R.string.chat_error_connect, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ChatService.start(getActivity());
-                            }
-                        })
-                        .setNeutralButton(R.string.chat_error_settings, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                FragmentManager fm = getFragmentManager();
-                                new SettingsFragment().show(fm, null);
-                            }
-                        })
-                        .setNegativeButton(R.string.chat_error_leave, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                forceFinish();
-                            }
-                        })
-                        .setCancelable(false)
-                        .create();
-            }
-
-            errorDialog.setTitle(title);
-            errorDialog.setMessage(message);
-            errorDialog.show();
-        }
-    }
-
-    private void dismissProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
-    }
-
-    private void forceFinish() {
-        getActivity().stopService(new Intent(getActivity(), ChatService.class));
-        getActivity().finish();
     }
 }
