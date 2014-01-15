@@ -13,6 +13,9 @@ repositories {
     maven {
         url "http://www.bugsense.com/gradle/"
     }
+    maven {
+        url "https://repo.commonsware.com.s3.amazonaws.com"
+    }
 }
 
 dependencies {
@@ -23,6 +26,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup:otto:1.3.4'
     compile "com.bugsense.trace:bugsense:3.6"
+    compile 'com.commonsware.cwac:camera:0.5.4'
 }
 
 android {
