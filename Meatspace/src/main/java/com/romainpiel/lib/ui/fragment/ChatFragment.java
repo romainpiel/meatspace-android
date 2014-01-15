@@ -1,19 +1,15 @@
 package com.romainpiel.lib.ui.fragment;
 
-import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -27,10 +23,8 @@ import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.listener.OnMenuClickListener;
-import com.romainpiel.lib.ui.view.CameraPreview;
 import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.R;
-import com.romainpiel.meatspace.service.ChatService;
 import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
 import com.romainpiel.model.Device;
@@ -46,19 +40,17 @@ import butterknife.OnClick;
  * Date: 01/11/2013
  * Time: 16:55
  */
-public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureListener, CameraPreview.PreviewReadyCallback {
+public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureListener {
 
     private static final String STATE_LISTVIEW = "state_listview";
     private static final String POSITION_LIST = "position_list";
     private static final String POSITION_ITEM = "position_item";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
-    @InjectView(R.id.fragment_chat_camera_preview_container) FrameLayout cameraPreviewContainer;
     @InjectView(R.id.fragment_chat_input) EditText input;
     @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
     @InjectView(R.id.fragment_chat_progress_bar) ProgressBar progressBar;
     @InjectView(R.id.fragment_chat_char_count) TextView charCount;
-    private CameraPreview cameraPreview;
 
     private ChatAdapter adapter;
     private PreviewHelper previewHelper;
@@ -148,34 +140,8 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     }
 
     @Override
-    public void onPreviewReady() {
-        previewHelper.setAngle(cameraPreview.getAngle());
-        previewHelper.setFrontCamera(cameraPreview.isFrontCamera());
-    }
-
-    @Override
-    public void onPreviewFailed() {
-        ChatService.stop(getActivity());
-        new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.camera_cant_open_title)
-                .setMessage(R.string.camera_cant_open_message)
-                .setCancelable(false)
-                .setPositiveButton(R.string.camera_cant_open_ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        getActivity().finish();
-                    }
-                })
-                .show();
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
-
-        // stop camera preview
-        cameraPreview.stopPreview();
-        removeCameraView();
 
         // cancel capture
         previewHelper.cancelCapture();
@@ -188,12 +154,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onResume() {
         super.onResume();
 
-        // setup camera
-        addCameraView();
-        cameraPreview.startPreview();
-        cameraPreview.setPreviewCallback(previewHelper);
-        cameraPreview.setOnPreviewReady(this);
-
         // enable ui
         setInputEnabled(true);
 
@@ -204,20 +164,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Subscribe
     public void onMessage(ChatEvent event) {
         notifyDatasetChanged(event.getChatList(), event.isFromProducer());
-    }
-
-    private void addCameraView() {
-        cameraPreview = new CameraPreview(getActivity());
-        cameraPreviewContainer.addView(cameraPreview, 0,
-                new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        Gravity.CENTER_VERTICAL));
-    }
-
-    private void removeCameraView() {
-        cameraPreviewContainer.removeView(cameraPreview);
-        cameraPreview = null;
     }
 
     private void invalidateMaxCharCount() {
@@ -286,12 +232,12 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     private void setInputEnabled(boolean enabled) {
         input.setEnabled(enabled);
         sendBtn.setEnabled(enabled);
-        progressBar.setVisibility(enabled? View.GONE : View.VISIBLE);
+        progressBar.setVisibility(enabled ? View.GONE : View.VISIBLE);
     }
 
     public void switchCamera() {
         previewHelper.cancelCapture();
         setInputEnabled(true);
-        cameraPreview.switchCamera();
+        // TODO switch camera when camera view ready
     }
 }
