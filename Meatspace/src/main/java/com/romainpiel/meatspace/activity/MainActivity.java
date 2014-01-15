@@ -8,28 +8,43 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.romainpiel.Constants;
+import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.bus.UIEvent;
+import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.fragment.ChatFragment;
 import com.romainpiel.lib.ui.fragment.SettingsFragment;
+import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.meatspace.service.ChatService;
+import com.romainpiel.model.Device;
 import com.squareup.otto.Subscribe;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Meatspace
@@ -37,18 +52,54 @@ import com.squareup.otto.Subscribe;
  * Date: 01/11/2013
  * Time: 16:54
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements PreviewHelper.OnCaptureListener {
+
+    @InjectView(R.id.activity_main_input) EditText input;
+    @InjectView(R.id.activity_main_send) ImageButton sendBtn;
+    @InjectView(R.id.activity_main_progress_bar) ProgressBar progressBar;
+    @InjectView(R.id.activity_main_char_count) TextView charCount;
 
     private ProgressDialog progressDialog;
     private AlertDialog errorDialog, aboutDialog;
+    private PreviewHelper previewHelper;
+    private int maxCharCount;
+    private Device device;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (!BuildConfig.DEBUG) {
             BugSenseHandler.initAndStartSession(this, getString(R.string.key_bugsense));
         }
+
         setContentView(R.layout.activity_main);
+
+        ButterKnife.inject(this);
+
+        maxCharCount = getResources().getInteger(R.integer.input_max_char_count);
+
+        previewHelper = new PreviewHelper(new Handler());
+        previewHelper.setOnCaptureListener(this);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                invalidateMaxCharCount();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        invalidateMaxCharCount();
+
+        device = new Device(this);
     }
 
     @Override
@@ -70,6 +121,9 @@ public class MainActivity extends Activity {
     public void onPause() {
         super.onPause();
 
+        // cancel capture
+        previewHelper.cancelCapture();
+
         // unregister to bus
         BusManager.get().getChatBus().unregister(this);
     }
@@ -77,6 +131,9 @@ public class MainActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+
+        // enable ui
+        setInputEnabled(true);
 
         // register to bus
         BusManager.get().getChatBus().register(this);
@@ -99,7 +156,7 @@ public class MainActivity extends Activity {
             case R.id.menu_main_switch_camera:
                 ChatFragment fragment = (ChatFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
                 if (fragment != null) {
-                    fragment.switchCamera();
+                    switchCamera();
                 }
                 break;
             case R.id.menu_main_disconnect:
@@ -259,5 +316,60 @@ public class MainActivity extends Activity {
     private void forceFinish() {
         stopService(new Intent(this, ChatService.class));
         finish();
+    }
+
+
+    @OnClick(R.id.activity_main_send)
+    public void send() {
+        previewHelper.capture();
+    }
+
+    @Override
+    public void onCaptureStarted() {
+        progressBar.setProgress(0);
+        setInputEnabled(false);
+    }
+
+    @Override
+    public void onCaptureProgress(float progress) {
+        progressBar.setProgress((int) (progress * 100));
+    }
+
+    @Override
+    public void onCaptureComplete(byte[] gifData) {
+
+        ApiManager.get().emit(
+                this,
+                UIUtils.getText(input),
+                gifData,
+                device.getId()
+        );
+
+        input.setText(null);
+        setInputEnabled(true);
+    }
+
+    @Override
+    public void onCaptureFailed() {
+        setInputEnabled(true);
+        Toast.makeText(this, R.string.chat_error_couldnotpostmessage, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setInputEnabled(boolean enabled) {
+        input.setEnabled(enabled);
+        sendBtn.setEnabled(enabled);
+        progressBar.setVisibility(enabled ? View.GONE : View.VISIBLE);
+    }
+
+    public void switchCamera() {
+        previewHelper.cancelCapture();
+        setInputEnabled(true);
+        // TODO switch camera when camera view ready
+    }
+
+    private void invalidateMaxCharCount() {
+        int maxCharLeft = maxCharCount - input.getText().length();
+        charCount.setText(String.valueOf(maxCharLeft));
+        sendBtn.setEnabled(maxCharLeft >= 0);
     }
 }

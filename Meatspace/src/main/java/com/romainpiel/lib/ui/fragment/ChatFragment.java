@@ -4,35 +4,24 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.romainpiel.lib.api.ApiManager;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.bus.MuteEvent;
-import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.adapter.ChatAdapter;
 import com.romainpiel.lib.ui.listener.OnMenuClickListener;
 import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.R;
 import com.romainpiel.model.Chat;
 import com.romainpiel.model.ChatList;
-import com.romainpiel.model.Device;
 import com.squareup.otto.Subscribe;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 
 /**
  * Meatspace
@@ -40,24 +29,17 @@ import butterknife.OnClick;
  * Date: 01/11/2013
  * Time: 16:55
  */
-public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureListener {
+public class ChatFragment extends Fragment {
 
     private static final String STATE_LISTVIEW = "state_listview";
     private static final String POSITION_LIST = "position_list";
     private static final String POSITION_ITEM = "position_item";
 
     @InjectView(R.id.fragment_chat_list) ListView listView;
-    @InjectView(R.id.fragment_chat_input) EditText input;
-    @InjectView(R.id.fragment_chat_send) ImageButton sendBtn;
-    @InjectView(R.id.fragment_chat_progress_bar) ProgressBar progressBar;
-    @InjectView(R.id.fragment_chat_char_count) TextView charCount;
 
     private ChatAdapter adapter;
-    private PreviewHelper previewHelper;
     private Handler uiHandler;
-    private Device device;
     private Parcelable listViewState;
-    private int maxCharCount;
     private int listPosition, itemPosition;
 
     public ChatFragment() {
@@ -68,29 +50,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, null);
         ButterKnife.inject(this, view);
-
-        maxCharCount = getResources().getInteger(R.integer.input_max_char_count);
-
-        previewHelper = new PreviewHelper(uiHandler);
-        previewHelper.setOnCaptureListener(this);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                invalidateMaxCharCount();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        invalidateMaxCharCount();
-
         return view;
     }
 
@@ -112,10 +71,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
                     BusManager.get().getChatBus().post(new MuteEvent(true, item.getValue().getFingerprint()));
                 }
             });
-        }
-
-        if (device == null) {
-            device = new Device(getActivity());
         }
 
         listView.setAdapter(adapter);
@@ -143,9 +98,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onPause() {
         super.onPause();
 
-        // cancel capture
-        previewHelper.cancelCapture();
-
         // unregister to bus
         BusManager.get().getChatBus().unregister(this);
     }
@@ -154,9 +106,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     public void onResume() {
         super.onResume();
 
-        // enable ui
-        setInputEnabled(true);
-
         // register to bus
         BusManager.get().getChatBus().register(this);
     }
@@ -164,12 +113,6 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
     @Subscribe
     public void onMessage(ChatEvent event) {
         notifyDatasetChanged(event.getChatList(), event.isFromProducer());
-    }
-
-    private void invalidateMaxCharCount() {
-        int maxCharLeft = maxCharCount - input.getText().length();
-        charCount.setText(String.valueOf(maxCharLeft));
-        sendBtn.setEnabled(maxCharLeft >= 0);
     }
 
     public void notifyDatasetChanged(final ChatList chatList, final boolean forceScrollToBottom) {
@@ -191,53 +134,5 @@ public class ChatFragment extends Fragment implements PreviewHelper.OnCaptureLis
             }
 
         });
-    }
-
-    @OnClick(R.id.fragment_chat_send)
-    public void send() {
-        previewHelper.capture();
-    }
-
-    @Override
-    public void onCaptureStarted() {
-        progressBar.setProgress(0);
-        setInputEnabled(false);
-    }
-
-    @Override
-    public void onCaptureProgress(float progress) {
-        progressBar.setProgress((int) (progress * 100));
-    }
-
-    @Override
-    public void onCaptureComplete(byte[] gifData) {
-
-        ApiManager.get().emit(
-                getActivity(),
-                UIUtils.getText(input),
-                gifData,
-                device.getId()
-        );
-
-        input.setText(null);
-        setInputEnabled(true);
-    }
-
-    @Override
-    public void onCaptureFailed() {
-        setInputEnabled(true);
-        Toast.makeText(getActivity(), R.string.chat_error_couldnotpostmessage, Toast.LENGTH_SHORT).show();
-    }
-
-    private void setInputEnabled(boolean enabled) {
-        input.setEnabled(enabled);
-        sendBtn.setEnabled(enabled);
-        progressBar.setVisibility(enabled ? View.GONE : View.VISIBLE);
-    }
-
-    public void switchCamera() {
-        previewHelper.cancelCapture();
-        setInputEnabled(true);
-        // TODO switch camera when camera view ready
     }
 }
