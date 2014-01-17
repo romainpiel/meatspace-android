@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.commonsware.cwac.camera.CameraFragment;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.romainpiel.Constants;
 import com.romainpiel.lib.api.ApiManager;
@@ -33,6 +34,7 @@ import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.bus.UIEvent;
 import com.romainpiel.lib.helper.PreviewHelper;
+import com.romainpiel.lib.ui.fragment.CameraPreviewFragment;
 import com.romainpiel.lib.ui.fragment.ChatFragment;
 import com.romainpiel.lib.ui.fragment.SettingsFragment;
 import com.romainpiel.lib.utils.UIUtils;
@@ -61,6 +63,7 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
 
     private ProgressDialog progressDialog;
     private AlertDialog errorDialog, aboutDialog;
+    private CameraFragment frontCameraFragment, backCameraFragment;
     private PreviewHelper previewHelper;
     private int maxCharCount;
     private Device device;
@@ -100,6 +103,14 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
         invalidateMaxCharCount();
 
         device = new Device(this);
+
+        // TODO put that in a separate method
+        frontCameraFragment = new CameraPreviewFragment();
+
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.activity_main_camera_preview, frontCameraFragment)
+                .commit();
     }
 
     @Override
