@@ -27,7 +27,7 @@ public class CameraPreviewFragment extends CameraFragment {
         cameraView.setHost(new CameraHost(getActivity()));
         cameraView.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                100,
+                ViewGroup.LayoutParams.MATCH_PARENT,
                 Gravity.CENTER_VERTICAL
         ));
         cameraView.setBackgroundColor(0x00ff00);

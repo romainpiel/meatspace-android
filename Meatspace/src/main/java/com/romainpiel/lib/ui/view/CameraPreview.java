@@ -25,7 +25,7 @@ public class CameraPreview extends CameraView {
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        Debug.out("onMeasure "+width + " " + height);
+        Debug.out("onMeasure " + width + " " + height);
 
         setMeasuredDimension(width, height);
     }
@@ -43,6 +43,8 @@ public class CameraPreview extends CameraView {
             final int width = r - l;
             final int height = b - t;
             Debug.out("onLayout "+width + " " + height);
+
+            child.layout(l, t, r, b);
         }
 
     }
