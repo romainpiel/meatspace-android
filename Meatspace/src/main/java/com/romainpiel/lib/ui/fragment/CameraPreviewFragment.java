@@ -11,7 +11,6 @@ import android.widget.FrameLayout;
 import com.commonsware.cwac.camera.CameraFragment;
 import com.commonsware.cwac.camera.CameraView;
 import com.commonsware.cwac.camera.SimpleCameraHost;
-import com.romainpiel.lib.ui.view.CameraPreview;
 
 /**
  * meatspace-android
@@ -23,14 +22,13 @@ public class CameraPreviewFragment extends CameraFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        CameraView cameraView = new CameraPreview(getActivity());
+        CameraView cameraView = new CameraView(getActivity());
         cameraView.setHost(new CameraHost(getActivity()));
         cameraView.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 Gravity.CENTER_VERTICAL
         ));
-        cameraView.setBackgroundColor(0x00ff00);
 
         setCameraView(cameraView);
 

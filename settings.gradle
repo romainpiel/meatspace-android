@@ -1,2 +1,3 @@
 include ':Meatspace'
 include ':Library:android-websockets'
+include ':Library:cwac-camera:camera'

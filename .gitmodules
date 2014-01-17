@@ -1,3 +1,6 @@
 [submodule "Library/android-websockets"]
 	path = Library/android-websockets
 	url = https://github.com/RomainPiel/android-websockets.git
+[submodule "Library/cwac-camera"]
+	path = Library/cwac-camera
+	url = https://github.com/RomainPiel/cwac-camera.git

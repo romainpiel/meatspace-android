@@ -13,20 +13,17 @@ repositories {
     maven {
         url "http://www.bugsense.com/gradle/"
     }
-    maven {
-        url "https://repo.commonsware.com.s3.amazonaws.com"
-    }
 }
 
 dependencies {
     compile project(':Library:android-websockets')
+    compile project(':Library:cwac-camera:camera')
     compile fileTree(dir: 'libs', include: '*.jar')
     compile 'com.android.support:support-v4:19.0.+'
     compile 'com.jakewharton:butterknife:4.0.1'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup:otto:1.3.4'
     compile "com.bugsense.trace:bugsense:3.6"
-    compile 'com.commonsware.cwac:camera:0.5.4'
 }
 
 android {
