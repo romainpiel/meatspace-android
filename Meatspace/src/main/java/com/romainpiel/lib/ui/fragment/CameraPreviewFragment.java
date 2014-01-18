@@ -25,6 +25,7 @@ public class CameraPreviewFragment extends CameraFragment {
     private static final String EXTRA_IS_FRONT = "is_front";
 
     private PreviewHelper previewHelper;
+    private boolean isFrontCamera;
 
     public static CameraPreviewFragment newInstance(boolean isFront) {
         Bundle args = new Bundle();
@@ -54,6 +55,9 @@ public class CameraPreviewFragment extends CameraFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        isFrontCamera = getArguments().getBoolean(EXTRA_IS_FRONT);
+        previewHelper.setFrontCamera(isFrontCamera);
+
         CameraView cameraView = new CameraView(getActivity());
         cameraView.setHost(new CameraHost(getActivity()));
         cameraView.setLayoutParams(new FrameLayout.LayoutParams(
@@ -75,7 +79,7 @@ public class CameraPreviewFragment extends CameraFragment {
 
         @Override
         protected boolean useFrontFacingCamera() {
-            return getArguments().getBoolean(EXTRA_IS_FRONT);
+            return isFrontCamera;
         }
 
         @Override
