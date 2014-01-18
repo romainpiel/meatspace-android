@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextUtils;
@@ -64,7 +63,6 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
     private AlertDialog errorDialog, aboutDialog;
     private CameraPreviewFragment frontCameraFragment, backCameraFragment;
     private Boolean isFrontCamera;
-    private PreviewHelper previewHelper;
     private int maxCharCount;
     private Device device;
     private PreferencesHelper preferencesHelper;
@@ -84,8 +82,6 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
         maxCharCount = getResources().getInteger(R.integer.input_max_char_count);
 
         preferencesHelper = new PreferencesHelper(this);
-        previewHelper = new PreviewHelper(new Handler());
-        previewHelper.setOnCaptureListener(this);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -129,7 +125,9 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
         super.onPause();
 
         // cancel capture
-        previewHelper.cancelCapture();
+        if (getCurrentFragment() != null) {
+            getCurrentFragment().cancelCapture();
+        }
 
         // unregister to bus
         BusManager.get().getChatBus().unregister(this);
@@ -325,7 +323,9 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
 
     @OnClick(R.id.activity_main_send)
     public void send() {
-        previewHelper.capture();
+        if (getCurrentFragment() != null) {
+            getCurrentFragment().capture();
+        }
     }
 
     @Override
@@ -367,7 +367,9 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
 
     public void setupCamera(boolean toggle) {
         // cancel capture
-        previewHelper.cancelCapture();
+        if (getCurrentFragment() != null) {
+            getCurrentFragment().cancelCapture();
+        }
         setInputEnabled(true);
 
         // check from prefs if null
@@ -387,6 +389,7 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
         // or create one if first time on that orientation
         if (f == null) {
             f = CameraPreviewFragment.newInstance(isFrontCamera);
+            f.setOnCaptureListener(this);
         }
 
         // save that in a variable
@@ -407,5 +410,9 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
         int maxCharLeft = maxCharCount - input.getText().length();
         charCount.setText(String.valueOf(maxCharLeft));
         sendBtn.setEnabled(maxCharLeft >= 0);
+    }
+
+    private CameraPreviewFragment getCurrentFragment() {
+        return isFrontCamera == null || isFrontCamera? frontCameraFragment : backCameraFragment;
     }
 }
