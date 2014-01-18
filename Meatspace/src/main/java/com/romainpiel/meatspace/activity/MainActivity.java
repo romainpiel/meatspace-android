@@ -25,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
-import com.commonsware.cwac.camera.CameraFragment;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.romainpiel.Constants;
 import com.romainpiel.lib.api.ApiManager;
@@ -33,9 +32,9 @@ import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.bus.ChatEvent;
 import com.romainpiel.lib.bus.MuteEvent;
 import com.romainpiel.lib.bus.UIEvent;
+import com.romainpiel.lib.helper.PreferencesHelper;
 import com.romainpiel.lib.helper.PreviewHelper;
 import com.romainpiel.lib.ui.fragment.CameraPreviewFragment;
-import com.romainpiel.lib.ui.fragment.ChatFragment;
 import com.romainpiel.lib.ui.fragment.SettingsFragment;
 import com.romainpiel.lib.utils.UIUtils;
 import com.romainpiel.meatspace.BuildConfig;
@@ -63,10 +62,12 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
 
     private ProgressDialog progressDialog;
     private AlertDialog errorDialog, aboutDialog;
-    private CameraFragment frontCameraFragment, backCameraFragment;
+    private CameraPreviewFragment frontCameraFragment, backCameraFragment;
+    private Boolean isFrontCamera;
     private PreviewHelper previewHelper;
     private int maxCharCount;
     private Device device;
+    private PreferencesHelper preferencesHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +83,7 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
 
         maxCharCount = getResources().getInteger(R.integer.input_max_char_count);
 
+        preferencesHelper = new PreferencesHelper(this);
         previewHelper = new PreviewHelper(new Handler());
         previewHelper.setOnCaptureListener(this);
         input.addTextChangedListener(new TextWatcher() {
@@ -104,13 +106,7 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
 
         device = new Device(this);
 
-        // TODO put that in a separate method
-        frontCameraFragment = new CameraPreviewFragment();
-
-        getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.activity_main_camera_preview, frontCameraFragment)
-                .commit();
+        setupCamera(false);
     }
 
     @Override
@@ -165,10 +161,7 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
 
         switch (item.getItemId()) {
             case R.id.menu_main_switch_camera:
-                ChatFragment fragment = (ChatFragment) getFragmentManager().findFragmentById(R.id.main_fragment);
-                if (fragment != null) {
-                    switchCamera();
-                }
+                setupCamera(true);
                 break;
             case R.id.menu_main_disconnect:
                 sendBroadcast(new Intent(Constants.FILTER_CHAT_CLOSE));
@@ -372,10 +365,42 @@ public class MainActivity extends Activity implements PreviewHelper.OnCaptureLis
         progressBar.setVisibility(enabled ? View.GONE : View.VISIBLE);
     }
 
-    public void switchCamera() {
+    public void setupCamera(boolean toggle) {
+        // cancel capture
         previewHelper.cancelCapture();
         setInputEnabled(true);
-        // TODO switch camera when camera view ready
+
+        // check from prefs if null
+        if (isFrontCamera == null) {
+            isFrontCamera = preferencesHelper.isFrontCamera(true);
+        }
+
+        // else toggle if that's we want
+        else if (toggle) {
+            isFrontCamera = !isFrontCamera;
+            preferencesHelper.saveIsFrontCamera(isFrontCamera);
+        }
+
+        // take previous fragment
+        CameraPreviewFragment f = isFrontCamera? frontCameraFragment : backCameraFragment;
+
+        // or create one if first time on that orientation
+        if (f == null) {
+            f = CameraPreviewFragment.newInstance(isFrontCamera);
+        }
+
+        // save that in a variable
+        if (isFrontCamera) {
+            frontCameraFragment = f;
+        } else {
+            backCameraFragment = f;
+        }
+
+        // and show!
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.activity_main_camera_preview, f)
+                .commit();
     }
 
     private void invalidateMaxCharCount() {

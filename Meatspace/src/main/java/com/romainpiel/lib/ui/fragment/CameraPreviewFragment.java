@@ -19,6 +19,16 @@ import com.commonsware.cwac.camera.SimpleCameraHost;
  */
 public class CameraPreviewFragment extends CameraFragment {
 
+    private static final String EXTRA_IS_FRONT = "is_front";
+
+    public static CameraPreviewFragment newInstance(boolean isFront) {
+        Bundle args = new Bundle();
+        args.putBoolean(EXTRA_IS_FRONT, isFront);
+        CameraPreviewFragment f = new CameraPreviewFragment();
+        f.setArguments(args);
+        return f;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -39,6 +49,11 @@ public class CameraPreviewFragment extends CameraFragment {
 
         public CameraHost(Context context) {
             super(context);
+        }
+
+        @Override
+        protected boolean useFrontFacingCamera() {
+            return getArguments().getBoolean(EXTRA_IS_FRONT);
         }
     }
 }

@@ -1,9 +1,6 @@
 package com.romainpiel.meatspace;
 
 import android.app.Application;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.romainpiel.lib.helper.PreferencesHelper;
