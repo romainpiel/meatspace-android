@@ -8,7 +8,8 @@ An android client for the great chatting space [https://chat.meatspac.es](https:
 
 Check out the sources and submodules:
 ```bash
-> git submodule init --update
+> git submodule init
+> git submodule update
 ```
 
 ### Run on your machine:
@@ -26,12 +27,16 @@ Create a file `keys.xml` located at `Meatspace/src/main/res/values/` and list th
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="key_api_debug">blahblahblah</string>
-    <string name="key_api_staging"></string>
-    <string name="key_api_release"></string>
-
     <string name="key_bugsense"></string>
 </resources>
+```
+
+Create a file `ApiKeyGenerator.java` located at `Meatspace/src/main/java/com/romainpiel/lib/utils/`:
+
+```java
+public static String getApiKey() {
+    return "your_api_key";
+}
 ```
 
 To start the android app in debug mode, run that from the android project folder:
