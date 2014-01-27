@@ -27,7 +27,7 @@ dependencies {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    buildToolsVersion "19.0.1"
 
     defaultConfig {
         minSdkVersion 14
@@ -66,6 +66,9 @@ android {
             buildConfigField "int", "MEATSPACE_KEY", "com.romainpiel.meatspace.R.string.key_api_release"
             debuggable false
             zipAlign true
+            runProguard true
+            proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
+            proguardFile 'proguard-project.txt'
         }
     }
 }

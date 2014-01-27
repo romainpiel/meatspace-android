@@ -1,0 +1,17 @@
+# Butterknife
+-dontwarn butterknife.internal.**
+-keep class **$$ViewInjector { *; }
+-keepnames class * { @butterknife.InjectView *;}
+
+# Otto
+-keepclassmembers class ** {
+    @com.squareup.otto.Subscribe public *;
+    @com.squareup.otto.Produce public *;
+}
+
+# Gson
+-keep public class com.google.gson
+-keep class com.someapp.android.models.ChatModel { *; }
+-keep class com.someapp.android.models.FeedModel { *; }
+-keepattributes Signature
+-keep class com.romainpiel.model.** { *; }
