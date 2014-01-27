@@ -12,4 +12,5 @@
 local.properties
 
 Meatspace/src/main/res/values/keys.xml
+Meatspace/src/main/java/com/romainpiel/lib/utils/ApiKeyGenerator.java
 Meatspace/meatspace.keystore
