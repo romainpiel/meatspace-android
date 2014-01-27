@@ -49,21 +49,18 @@ android {
         debug {
             signingConfig signingConfigs.debug
             buildConfigField "int", "MEATSPACE_BASE_URL", "com.romainpiel.meatspace.R.string.url_api_debug"
-            buildConfigField "int", "MEATSPACE_KEY", "com.romainpiel.meatspace.R.string.key_api_debug"
             debuggable true
             zipAlign false
         }
         staging {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             buildConfigField "int", "MEATSPACE_BASE_URL", "com.romainpiel.meatspace.R.string.url_api_staging"
-            buildConfigField "int", "MEATSPACE_KEY", "com.romainpiel.meatspace.R.string.key_api_staging"
-            debuggable false
+            debuggable true
             zipAlign true
         }
         release {
             signingConfig signingConfigs.release
             buildConfigField "int", "MEATSPACE_BASE_URL", "com.romainpiel.meatspace.R.string.url_api_release"
-            buildConfigField "int", "MEATSPACE_KEY", "com.romainpiel.meatspace.R.string.key_api_release"
             debuggable false
             zipAlign true
             runProguard true

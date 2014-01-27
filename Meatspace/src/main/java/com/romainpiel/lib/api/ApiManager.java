@@ -10,6 +10,7 @@ import com.koushikdutta.async.http.socketio.ConnectCallback;
 import com.koushikdutta.async.http.socketio.SocketIOClient;
 import com.romainpiel.lib.bus.BusManager;
 import com.romainpiel.lib.helper.PreferencesHelper;
+import com.romainpiel.lib.utils.ApiKeyGenerator;
 import com.romainpiel.meatspace.BuildConfig;
 import com.romainpiel.model.ChatRequest;
 import com.romainpiel.model.GifMedia;
@@ -68,7 +69,7 @@ public class ApiManager {
         }
 
         ChatRequest chatRequest = new ChatRequest(
-                context.getString(BuildConfig.MEATSPACE_KEY),
+                ApiKeyGenerator.getApiKey(),
                 text,
                 media,
                 fingerprint
