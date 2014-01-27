@@ -28,8 +28,10 @@ public class ApiManager {
     private static ApiManager instance;
 
     private Gson jsonParser;
+    private String apiKey;
 
     private ApiManager() {
+        apiKey = ApiKeyGenerator.getApiKey();
     }
 
     public static ApiManager get() {
@@ -69,7 +71,7 @@ public class ApiManager {
         }
 
         ChatRequest chatRequest = new ChatRequest(
-                ApiKeyGenerator.getApiKey(),
+                apiKey,
                 text,
                 media,
                 fingerprint
