@@ -34,8 +34,10 @@ Create a file `keys.xml` located at `Meatspace/src/main/res/values/` and list th
 Create a file `ApiKeyGenerator.java` located at `Meatspace/src/main/java/com/romainpiel/lib/utils/`:
 
 ```java
-public static String getApiKey() {
-    return "your_api_key";
+public class ApiKeyGenerator {
+    public static String getApiKey() {
+        return "your_api_key";
+    }
 }
 ```
 
